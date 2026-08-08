@@ -44,16 +44,28 @@ export const db = new Proxy({} as ReturnType<typeof panel>, {
 });
 
 /**
- * Bases de los productos. Solo lectura — nunca ejecutar INSERT/UPDATE/DELETE
- * contra estas: son las bases de producción de cada SaaS.
+ * Bases de los productos: solo lectura, y garantizado por Postgres.
+ *
+ * Las URLs usan el mismo usuario que cada app, que sí puede escribir. Para
+ * que un error aquí no pueda tocar datos de producción, cada conexión nueva
+ * se marca como read-only apenas se abre: cualquier INSERT/UPDATE/DELETE
+ * falla en el servidor, no queda dependiendo de que el código se porte bien.
  *
  * Se crean de forma perezosa para que el panel arranque aunque falte la URL
  * de un producto (por ejemplo, si todavía no configuraste mecanicoapp).
  */
+function crearPoolSoloLectura(url: string | undefined, nombre: string): Pool {
+  const pool = crearPool(url, nombre);
+  pool.on("connect", (cliente) => {
+    cliente.query("set default_transaction_read_only = on");
+  });
+  return pool;
+}
+
 export function dbFacilagua() {
   const pool =
     global.poolFacilagua ??
-    crearPool(process.env.DATABASE_URL_FACILAGUA, "FacilAgua");
+    crearPoolSoloLectura(process.env.DATABASE_URL_FACILAGUA, "FacilAgua");
   if (process.env.NODE_ENV !== "production") global.poolFacilagua = pool;
   return drizzle(pool);
 }
@@ -61,7 +73,7 @@ export function dbFacilagua() {
 export function dbMecanicoapp() {
   const pool =
     global.poolMecanicoapp ??
-    crearPool(process.env.DATABASE_URL_MECANICOAPP, "mecanicoapp");
+    crearPoolSoloLectura(process.env.DATABASE_URL_MECANICOAPP, "mecanicoapp");
   if (process.env.NODE_ENV !== "production") global.poolMecanicoapp = pool;
   return drizzle(pool);
 }
