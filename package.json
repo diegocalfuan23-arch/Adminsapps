@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:push": "bun --env-file=.env.local drizzle-kit push",
+    "db:studio": "bun --env-file=.env.local drizzle-kit studio"
   },
   "dependencies": {
     "better-auth": "^1.6.26",
