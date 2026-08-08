@@ -4,10 +4,19 @@ import { db } from "@/lib/db";
 import * as schema from "@/lib/db/auth-schema";
 
 /**
- * Panel de un solo usuario. El registro queda abierto en Better Auth pero
- * sirve una única vez: el hook rechaza cualquier correo que no sea el
- * autorizado, así nadie más puede crear cuenta aunque conozca la URL.
+ * Panel de un solo usuario, con el registro cerrado en dos capas:
+ *
+ * 1. `disableSignUp` apaga el endpoint de registro por completo. Se controla
+ *    con REGISTRO_ABIERTO="si": la enciendes una vez para crear tu cuenta y
+ *    la quitas enseguida. Con el registro apagado, el endpoint ni existe.
+ * 2. Si el registro está abierto, el hook igual rechaza cualquier correo que
+ *    no sea CORREO_AUTORIZADO.
+ *
+ * Dos capas y no una porque este panel lee las bases de producción de ambos
+ * SaaS: una cuenta de más aquí es acceso a todo.
  */
+const registroAbierto = process.env.REGISTRO_ABIERTO?.trim() === "si";
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -16,6 +25,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    disableSignUp: !registroAbierto,
     minPasswordLength: 12,
   },
   databaseHooks: {

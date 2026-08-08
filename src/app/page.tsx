@@ -1,4 +1,7 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Check, X } from "lucide-react";
+import { auth } from "@/lib/auth";
 
 /**
  * Estado de configuración del panel. Mientras no haya métricas que mostrar,
@@ -47,7 +50,10 @@ function revisar(): Requisito[] {
   ];
 }
 
-export default function Home() {
+export default async function Home() {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) redirect("/entrar");
+
   const requisitos = revisar();
   const pendientes = requisitos.filter((r) => !r.listo).length;
 
