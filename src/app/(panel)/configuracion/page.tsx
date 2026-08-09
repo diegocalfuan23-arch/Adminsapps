@@ -1,11 +1,8 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { Check, X } from "lucide-react";
-import { auth } from "@/lib/auth";
 
 /**
- * Estado de configuración del panel. Mientras no haya métricas que mostrar,
- * esta pantalla sirve para saber qué falta conectar antes de seguir.
+ * Estado de configuración: qué variables de entorno están puestas y para qué
+ * sirve cada una. La sesión ya la validó el layout del panel.
  */
 
 type Requisito = {
@@ -50,21 +47,18 @@ function revisar(): Requisito[] {
   ];
 }
 
-export default async function Home() {
-  const sesion = await auth.api.getSession({ headers: await headers() });
-  if (!sesion) redirect("/entrar");
-
+export default function ConfiguracionPage() {
   const requisitos = revisar();
   const pendientes = requisitos.filter((r) => !r.listo).length;
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-6 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight">Panel</h1>
+    <div className="w-full max-w-2xl">
+      <h1 className="text-2xl font-semibold tracking-tight">Configuración</h1>
       <p className="mt-1.5 text-sm text-black/60 dark:text-white/60">
-        Monitoreo de FacilAgua y mecanicoapp.
+        Variables que necesita el panel para funcionar.
       </p>
 
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">
           Configuración
         </h2>
@@ -110,6 +104,6 @@ export default async function Home() {
           </p>
         )}
       </section>
-    </main>
+    </div>
   );
 }
