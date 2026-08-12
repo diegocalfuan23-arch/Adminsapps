@@ -1,10 +1,14 @@
 import { BloqueProducto } from "@/components/kpi";
-import { metricasFacilagua } from "@/lib/metricas";
+import { ListaCuentas } from "@/components/cuentas";
+import { metricasFacilagua, cuentasFacilagua } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
 
 export default async function FacilaguaPage() {
-  const datos = await metricasFacilagua();
+  const [datos, cuentas] = await Promise.all([
+    metricasFacilagua(),
+    cuentasFacilagua(),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -16,6 +20,18 @@ export default async function FacilaguaPage() {
       </div>
 
       <BloqueProducto datos={datos} />
+
+      <section>
+        <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">
+          Comités registrados
+        </h2>
+        <div className="mt-3">
+          <ListaCuentas
+            cuentas={cuentas}
+            vacio="Todavía no hay comités registrados."
+          />
+        </div>
+      </section>
     </div>
   );
 }
