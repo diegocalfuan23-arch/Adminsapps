@@ -1,14 +1,20 @@
 import { BloqueProducto } from "@/components/kpi";
-import { metricasFacilagua, metricasMecanicoapp } from "@/lib/metricas";
+import { CostoIa } from "@/components/costo-ia";
+import {
+  costoIaFacilagua,
+  metricasFacilagua,
+  metricasMecanicoapp,
+} from "@/lib/metricas";
 
 // Los números cambian todo el tiempo: nunca servir una versión cacheada.
 export const dynamic = "force-dynamic";
 
 export default async function ResumenPage() {
   // En paralelo: son bases distintas, no tiene sentido esperar una tras otra.
-  const [facilagua, mecanicoapp] = await Promise.all([
+  const [facilagua, mecanicoapp, costoIa] = await Promise.all([
     metricasFacilagua(),
     metricasMecanicoapp(),
+    costoIaFacilagua(),
   ]);
 
   return (
@@ -21,6 +27,7 @@ export default async function ResumenPage() {
       </div>
 
       <BloqueProducto datos={facilagua} />
+      <CostoIa datos={costoIa} />
       <BloqueProducto datos={mecanicoapp} />
     </div>
   );

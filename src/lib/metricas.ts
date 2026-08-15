@@ -191,6 +191,109 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
   }));
 }
 
+/**
+ * Precio por millón de tokens, en USD, de los modelos que usa FacilAgua.
+ * Hay que actualizarlos a mano si cambian: no existe un endpoint de
+ * Anthropic/OpenAI que los entregue.
+ *
+ * Fuente: precios publicados en anthropic.com/pricing y openai.com/pricing,
+ * revisados 2026-08. "ninguno" (respuesta enlatada, sin proveedor) es $0.
+ */
+const PRECIO_POR_MILLON_USD: Record<string, { entrada: number; salida: number }> = {
+  "claude-haiku-4-5": { entrada: 1, salida: 5 },
+  "claude-opus-5": { entrada: 5, salida: 25 },
+  "gpt-4o-mini": { entrada: 0.15, salida: 0.6 },
+  ninguno: { entrada: 0, salida: 0 },
+};
+
+export type CostoIaProducto = {
+  producto: string;
+  error: string | null;
+  totalUsd: number | null;
+  llamadas: number | null;
+  porOrigen: { origen: string; llamadas: number; usd: number }[];
+  porComite: { aprId: string | null; nombre: string; usd: number }[];
+};
+
+/**
+ * Costo de IA de FacilAgua en los últimos 30 días, calculado desde tokens
+ * reales (tabla UsoIA) — no desde `max_tokens`, que es solo el tope pedido,
+ * nunca lo que se gastó.
+ */
+export async function costoIaFacilagua(): Promise<CostoIaProducto> {
+  try {
+    const filasUso = await filas<{
+      origen: string;
+      aprId: string | null;
+      nombreComite: string | null;
+      modelo: string;
+      tokensEntrada: number;
+      tokensSalida: number;
+    }>(
+      dbFacilagua,
+      `select u.origen, u."aprId", a.nombre as "nombreComite", u.modelo,
+         u."tokensEntrada", u."tokensSalida"
+       from "UsoIA" u
+       left join "Apr" a on a.id = u."aprId"
+       where u."createdAt" > now() - interval '30 days'`
+    );
+
+    let totalUsd = 0;
+    const porOrigenMap = new Map<string, { llamadas: number; usd: number }>();
+    const porComiteMap = new Map<
+      string,
+      { aprId: string | null; nombre: string; usd: number }
+    >();
+
+    for (const f of filasUso) {
+      const precio = PRECIO_POR_MILLON_USD[f.modelo];
+      // Modelo desconocido (ej. se cambió el nombre en el código y no se
+      // actualizó esta tabla): no se inventa un precio, se cuenta aparte.
+      const usd = precio
+        ? (f.tokensEntrada * precio.entrada + f.tokensSalida * precio.salida) /
+          1_000_000
+        : 0;
+      totalUsd += usd;
+
+      const origen = porOrigenMap.get(f.origen) ?? { llamadas: 0, usd: 0 };
+      origen.llamadas += 1;
+      origen.usd += usd;
+      porOrigenMap.set(f.origen, origen);
+
+      const claveComite = f.aprId ?? "sin-comite";
+      const comite = porComiteMap.get(claveComite) ?? {
+        aprId: f.aprId,
+        nombre: f.nombreComite ?? "Landing (sin comité)",
+        usd: 0,
+      };
+      comite.usd += usd;
+      porComiteMap.set(claveComite, comite);
+    }
+
+    return {
+      producto: "FacilAgua",
+      error: null,
+      totalUsd,
+      llamadas: filasUso.length,
+      porOrigen: [...porOrigenMap.entries()]
+        .map(([origen, v]) => ({ origen, ...v }))
+        .sort((a, b) => b.usd - a.usd),
+      porComite: [...porComiteMap.values()]
+        .sort((a, b) => b.usd - a.usd)
+        .slice(0, 10),
+    };
+  } catch (e) {
+    return {
+      producto: "FacilAgua",
+      error: (e as Error).message,
+      totalUsd: null,
+      llamadas: null,
+      porOrigen: [],
+      porComite: [],
+    };
+  }
+}
+
 /** Los talleres de mecanicoapp. El taller ES el usuario. */
 export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
   const rows = await filas<{
