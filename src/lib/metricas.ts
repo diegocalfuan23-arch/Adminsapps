@@ -332,3 +332,41 @@ export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
     ].join(" · "),
   }));
 }
+
+/**
+ * Consulta desde el formulario público de facilagua.com. No pertenece a
+ * ningún comité — quien escribe todavía evalúa contratar — así que vive
+ * acá, en el panel del dueño, y no dentro del panel multi-tenant de
+ * FacilAgua.
+ */
+export type ConsultaFacilagua = {
+  id: string;
+  nombre: string;
+  apr: string;
+  contacto: string;
+  mensaje: string | null;
+  origen: string | null;
+  estado: "NUEVA" | "RESPONDIDA" | "DESCARTADA";
+  createdAt: Date;
+};
+
+export async function consultasFacilagua(): Promise<ConsultaFacilagua[]> {
+  const rows = await filas<{
+    id: string;
+    nombre: string;
+    apr: string;
+    contacto: string;
+    mensaje: string | null;
+    origen: string | null;
+    estado: "NUEVA" | "RESPONDIDA" | "DESCARTADA";
+    createdAt: string;
+  }>(
+    dbFacilagua,
+    `select id, nombre, apr, contacto, mensaje, origen, estado, "createdAt"
+     from "Consulta"
+     order by "createdAt" desc
+     limit 100`
+  );
+
+  return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
+}

@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Droplet, LayoutDashboard, Settings, Wrench } from "lucide-react";
+import {
+  Droplet,
+  Inbox,
+  LayoutDashboard,
+  Settings,
+  Wrench,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ENLACES = [
   { href: "/", etiqueta: "Resumen", icono: LayoutDashboard },
+  { href: "/consultas", etiqueta: "Consultas", icono: Inbox },
   { href: "/facilagua", etiqueta: "FacilAgua", icono: Droplet },
   { href: "/mecanicoapp", etiqueta: "mecanicoapp", icono: Wrench },
   { href: "/configuracion", etiqueta: "Configuración", icono: Settings },
