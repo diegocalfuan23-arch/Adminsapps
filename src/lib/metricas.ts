@@ -128,6 +128,8 @@ export async function metricasMecanicoapp(): Promise<MetricasProducto> {
 export type Cuenta = {
   id: string;
   nombre: string;
+  /** Correo de quien administra la cuenta (la directiva, el taller). */
+  correo: string | null;
   registrada: Date;
   /** Última señal de vida: lo más reciente que hizo en el producto. */
   ultimaActividad: Date | null;
@@ -153,6 +155,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     id: string;
     nombre: string;
     comuna: string | null;
+    correo: string | null;
     registrada: string;
     activo: boolean;
     socios: number;
@@ -161,6 +164,9 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
   }>(
     dbFacilagua,
     `select a.id, a.nombre, a.comuna, a."createdAt" as registrada, a.activo,
+       (select u.email from "user" u
+          where u."aprId" = a.id and u.rol = 'ADMIN'
+          order by u."createdAt" asc limit 1) as correo,
        (select count(*)::int from "Socio" s where s."aprId" = a.id) as socios,
        (select count(*)::int from "Boleta" b
           join "Socio" s on s.id = b."socioId" where s."aprId" = a.id) as boletas,
@@ -178,6 +184,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
   return rows.map((r) => ({
     id: r.id,
     nombre: r.nombre,
+    correo: r.correo,
     registrada: new Date(r.registrada),
     ultimaActividad: r.ultima ? new Date(r.ultima) : null,
     activo: r.activo,
@@ -321,12 +328,12 @@ export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
   return rows.map((r) => ({
     id: r.id,
     nombre: r.nombre,
+    correo: r.email,
     registrada: new Date(r.registrada),
     ultimaActividad: r.ultima ? new Date(r.ultima) : null,
     // mecanicoapp no tiene cuentas desactivadas todavía
     activo: true,
     detalle: [
-      r.email,
       `${r.vehiculos} ${r.vehiculos === 1 ? "vehículo" : "vehículos"}`,
       `${r.trabajos} ${r.trabajos === 1 ? "orden" : "órdenes"}`,
     ].join(" · "),

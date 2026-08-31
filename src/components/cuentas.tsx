@@ -65,7 +65,7 @@ export function ListaCuentas({
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-black/[0.08] text-left dark:border-white/[0.12]">
-            {["Nombre", "Registrado", "Última actividad", "Detalle"].map(
+            {["Nombre", "Correo", "Registrado", "Última actividad", "Detalle"].map(
               (c) => (
                 <th
                   key={c}
@@ -89,6 +89,11 @@ export function ListaCuentas({
                   <span className="ml-2 rounded-full bg-black/[0.06] px-2 py-0.5 text-[0.7rem] font-normal text-black/50 dark:bg-white/[0.08] dark:text-white/50">
                     inactivo
                   </span>
+                )}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-black/55 dark:text-white/55">
+                {c.correo ?? (
+                  <span className="text-black/30 dark:text-white/30">—</span>
                 )}
               </td>
               <td className="px-4 py-3 whitespace-nowrap tabular-nums text-black/55 dark:text-white/55">
