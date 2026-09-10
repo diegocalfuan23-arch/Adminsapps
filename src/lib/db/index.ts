@@ -14,6 +14,7 @@ const global = globalThis as unknown as {
   poolPanel?: Pool;
   poolFacilagua?: Pool;
   poolMecanicoapp?: Pool;
+  poolMecanicoappEscritura?: Pool;
 };
 
 function crearPool(url: string | undefined, nombre: string): Pool {
@@ -76,4 +77,29 @@ export function dbMecanicoapp() {
     crearPoolSoloLectura(process.env.DATABASE_URL_MECANICOAPP, "mecanicoapp");
   if (process.env.NODE_ENV !== "production") global.poolMecanicoapp = pool;
   return drizzle(pool);
+}
+
+/**
+ * Única excepción a "solo lectura" en las bases de producto: cambiar
+ * el plan de un taller de mecanicoapp a mano. Deliberadamente NO usa
+ * drizzle con el schema completo del producto — un UPDATE de SQL
+ * plano, acotado a la columna `plan` de `user`, para que esta
+ * conexión de escritura no pueda tocar nada más aunque el código de
+ * arriba cambie después. No se cachea en globalThis como las de
+ * solo lectura: se abre y se cierra en cada llamada, así nunca queda
+ * una conexión de escritura viva de más tiempo del necesario.
+ */
+export async function cambiarPlanMecanicoapp(userId: string, plan: string) {
+  const pool = crearPool(
+    process.env.DATABASE_URL_MECANICOAPP,
+    "mecanicoapp (escritura)"
+  );
+  try {
+    await pool.query(`update "user" set plan = $1 where id = $2`, [
+      plan,
+      userId,
+    ]);
+  } finally {
+    await pool.end();
+  }
 }

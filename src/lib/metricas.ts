@@ -135,6 +135,8 @@ export type Cuenta = {
   ultimaActividad: Date | null;
   activo: boolean;
   detalle: string;
+  /** Solo mecanicoapp por ahora: prueba · taller · serviteca · empresarial. */
+  plan?: string;
 };
 
 async function filas<T>(
@@ -311,10 +313,11 @@ export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
     vehiculos: number;
     trabajos: number;
     ultima: string | null;
+    plan: string;
   }>(
     dbMecanicoapp,
     `select u.id, coalesce(u.taller, u.name) as nombre, u.email,
-       u.created_at as registrada,
+       u.created_at as registrada, u.plan,
        (select count(*)::int from vehiculo v where v.taller_id = u.id) as vehiculos,
        (select count(*)::int from trabajo t where t.taller_id = u.id) as trabajos,
        greatest(
@@ -333,6 +336,7 @@ export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
     ultimaActividad: r.ultima ? new Date(r.ultima) : null,
     // mecanicoapp no tiene cuentas desactivadas todavía
     activo: true,
+    plan: r.plan,
     detalle: [
       `${r.vehiculos} ${r.vehiculos === 1 ? "vehículo" : "vehículos"}`,
       `${r.trabajos} ${r.trabajos === 1 ? "orden" : "órdenes"}`,

@@ -25,6 +25,15 @@ function Tarjeta({ etiqueta, valor, detalle }: Metrica) {
 }
 
 export function BloqueProducto({ datos }: { datos: MetricasProducto }) {
+  // Con 4 o menos métricas caben todas en una sola fila desde tablet
+  // en adelante; con más (ej. FacilAgua, 5), se mantiene el grid de 3
+  // columnas de siempre — evita que una fila de 5 quede 3+2 pareja
+  // pero igual de irregular que antes.
+  const columnas =
+    datos.metricas.length <= 4
+      ? "sm:grid-cols-2 lg:grid-cols-4"
+      : "sm:grid-cols-2 lg:grid-cols-3";
+
   return (
     <section>
       <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">
@@ -36,7 +45,7 @@ export function BloqueProducto({ datos }: { datos: MetricasProducto }) {
           No se pudo leer la base: {datos.error}
         </p>
       ) : (
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={`mt-3 grid gap-3 ${columnas}`}>
           {datos.metricas.map((m) => (
             <Tarjeta key={m.etiqueta} {...m} />
           ))}

@@ -1,4 +1,5 @@
 import type { Cuenta } from "@/lib/metricas";
+import { SelectorPlan } from "@/components/selector-plan";
 
 const FECHA = new Intl.DateTimeFormat("es-CL", {
   day: "2-digit",
@@ -60,21 +61,27 @@ export function ListaCuentas({
     );
   }
 
+  // La columna "Plan" solo aparece si al menos una cuenta lo trae —
+  // hoy solo mecanicoapp lo tiene, FacilAgua no debe mostrar la
+  // columna ni el selector.
+  const conPlan = cuentas.some((c) => c.plan !== undefined);
+  const columnas = conPlan
+    ? ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle", "Plan"]
+    : ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle"];
+
   return (
     <div className="overflow-x-auto rounded-xl border border-black/[0.08] dark:border-white/[0.12]">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-black/[0.08] text-left dark:border-white/[0.12]">
-            {["Nombre", "Correo", "Registrado", "Última actividad", "Detalle"].map(
-              (c) => (
-                <th
-                  key={c}
-                  className="px-4 py-3 text-[0.72rem] font-semibold tracking-[0.06em] text-black/50 uppercase dark:text-white/50"
-                >
-                  {c}
-                </th>
-              )
-            )}
+            {columnas.map((c) => (
+              <th
+                key={c}
+                className="px-4 py-3 text-[0.72rem] font-semibold tracking-[0.06em] text-black/50 uppercase dark:text-white/50"
+              >
+                {c}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -105,6 +112,13 @@ export function ListaCuentas({
               <td className="px-4 py-3 text-black/55 dark:text-white/55">
                 {c.detalle}
               </td>
+              {conPlan && (
+                <td className="px-4 py-3 whitespace-nowrap">
+                  {c.plan !== undefined && (
+                    <SelectorPlan userId={c.id} planActual={c.plan} />
+                  )}
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
