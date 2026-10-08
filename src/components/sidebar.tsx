@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 const ENLACES = [
   { href: "/", etiqueta: "Resumen", icono: LayoutDashboard },
   { href: "/consultas", etiqueta: "Consultas", icono: Inbox },
-  { href: "/facilagua", etiqueta: "FacilAgua", icono: Droplet },
+  { href: "/facilagua", etiqueta: "Facilapr", icono: Droplet },
   { href: "/mecanicoapp", etiqueta: "mecanicoapp", icono: Wrench },
   { href: "/configuracion", etiqueta: "Configuración", icono: Settings },
 ];
