@@ -362,6 +362,8 @@ export type ConsultaFacilagua = {
   mensaje: string | null;
   origen: string | null;
   estado: "NUEVA" | "RESPONDIDA" | "DESCARTADA";
+  /** Historial de lo hecho con la consulta (respondida, descartada…), con fechas. */
+  notas: string | null;
   createdAt: Date;
 };
 
@@ -374,10 +376,11 @@ export async function consultasFacilagua(): Promise<ConsultaFacilagua[]> {
     mensaje: string | null;
     origen: string | null;
     estado: "NUEVA" | "RESPONDIDA" | "DESCARTADA";
+    notas: string | null;
     createdAt: string;
   }>(
     dbFacilagua,
-    `select id, nombre, apr, contacto, mensaje, origen, estado, "createdAt"
+    `select id, nombre, apr, contacto, mensaje, origen, estado, notas, "createdAt"
      from "Consulta"
      order by "createdAt" desc
      limit 100`
