@@ -17,7 +17,7 @@ export default async function PanelLayout({
   return (
     <div className="flex min-h-full flex-1 flex-col md:flex-row">
       <Sidebar />
-      <main className="min-w-0 flex-1 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,#e4e4e7,#f4f4f5_70%)] px-6 py-8 md:px-10 dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,#27272a,#09090b_70%)]">
+      <main className="min-w-0 flex-1 bg-[radial-gradient(circle_at_50%_35%,#f4f4f5_0%,#d4d4d8_55%,#a1a1aa_100%)] px-6 py-8 md:px-10 dark:bg-[radial-gradient(circle_at_50%_35%,#27272a_0%,#18181b_55%,#09090b_100%)]">
         {children}
       </main>
     </div>
