@@ -12,7 +12,7 @@ export default async function ConsultasPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Consultas</h1>
         <p className="mt-1 text-sm text-black/55 dark:text-white/55">
-          Formulario de contacto de facilagua.com
+          Formulario de contacto de facilapr.cl
           {nuevas > 0 && ` — ${nuevas} sin responder`}.
         </p>
       </div>

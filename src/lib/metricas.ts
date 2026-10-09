@@ -56,7 +56,7 @@ export async function metricasFacilagua(): Promise<MetricasProducto> {
       ]);
 
     return {
-      producto: "FacilAgua",
+      producto: "Facilapr",
       error: null,
       metricas: [
         { etiqueta: "Comités", valor: comites },
@@ -76,7 +76,7 @@ export async function metricasFacilagua(): Promise<MetricasProducto> {
     };
   } catch (e) {
     return {
-      producto: "FacilAgua",
+      producto: "Facilapr",
       error: (e as Error).message,
       metricas: [],
     };
@@ -151,7 +151,7 @@ async function filas<T>(
   }
 }
 
-/** Los comités de FacilAgua, del más activo al más dormido. */
+/** Los comités de Facilapr, del más activo al más dormido. */
 export async function cuentasFacilagua(): Promise<Cuenta[]> {
   const rows = await filas<{
     id: string;
@@ -205,7 +205,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
 }
 
 /**
- * Precio por millón de tokens, en USD, de los modelos que usa FacilAgua.
+ * Precio por millón de tokens, en USD, de los modelos que usa Facilapr.
  * Hay que actualizarlos a mano si cambian: no existe un endpoint de
  * Anthropic/OpenAI que los entregue.
  *
@@ -229,7 +229,7 @@ export type CostoIaProducto = {
 };
 
 /**
- * Costo de IA de FacilAgua en los últimos 30 días, calculado desde tokens
+ * Costo de IA de Facilapr en los últimos 30 días, calculado desde tokens
  * reales (tabla UsoIA) — no desde `max_tokens`, que es solo el tope pedido,
  * nunca lo que se gastó.
  */
@@ -284,7 +284,7 @@ export async function costoIaFacilagua(): Promise<CostoIaProducto> {
     }
 
     return {
-      producto: "FacilAgua",
+      producto: "Facilapr",
       error: null,
       totalUsd,
       llamadas: filasUso.length,
@@ -297,7 +297,7 @@ export async function costoIaFacilagua(): Promise<CostoIaProducto> {
     };
   } catch (e) {
     return {
-      producto: "FacilAgua",
+      producto: "Facilapr",
       error: (e as Error).message,
       totalUsd: null,
       llamadas: null,
@@ -349,7 +349,7 @@ export async function cuentasMecanicoapp(): Promise<Cuenta[]> {
 }
 
 /**
- * Consulta desde el formulario público de facilagua.com. No pertenece a
+ * Consulta desde el formulario público de facilapr.cl. No pertenece a
  * ningún comité — quien escribe todavía evalúa contratar — así que vive
  * acá, en el panel del dueño, y no dentro del panel multi-tenant de
  * FacilAgua.

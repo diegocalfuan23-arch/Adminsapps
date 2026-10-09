@@ -21,7 +21,7 @@ function revisar(): Requisito[] {
       detalle: "Guarda el usuario del panel y las notas.",
     },
     {
-      nombre: "Base de FacilAgua",
+      nombre: "Base de Facilapr",
       variable: "DATABASE_URL_FACILAGUA",
       listo: Boolean(process.env.DATABASE_URL_FACILAGUA),
       detalle: "Solo lectura: comités, socios, boletas, consultas.",
