@@ -177,7 +177,11 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
             join "Socio" s on s.id = b."socioId" where s."aprId" = a.id),
          (select max(l."createdAt") from "Lectura" l
             join "Socio" s on s.id = l."socioId" where s."aprId" = a.id),
-         (select max(s."createdAt") from "Socio" s where s."aprId" = a.id)
+         (select max(s."createdAt") from "Socio" s where s."aprId" = a.id),
+         -- Un ingreso también es actividad: un comité que entró pero aun no
+         -- carga datos no es lo mismo que uno que nunca abrió la app.
+         (select max(se."updatedAt") from session se
+            join "user" u on u.id = se."userId" where u."aprId" = a.id)
        ) as ultima
      from "Apr" a
      order by ultima desc nulls last, a."createdAt" desc`
