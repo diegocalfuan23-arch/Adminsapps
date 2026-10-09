@@ -1,5 +1,4 @@
-import { ListaCuentas } from "@/components/cuentas";
-import { CrearComite } from "@/components/crear-comite";
+import { ListaComites } from "@/components/lista-comites";
 import { cuentasFacilagua } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +11,7 @@ export default async function ComitesPage() {
     : null;
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Comités</h1>
         <p className="mt-1 text-sm text-black/55 dark:text-white/55">
@@ -20,19 +19,7 @@ export default async function ComitesPage() {
         </p>
       </div>
 
-      <CrearComite urlLogin={urlLogin} />
-
-      <section>
-        <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">
-          Comités registrados
-        </h2>
-        <div className="mt-3">
-          <ListaCuentas
-            cuentas={cuentas}
-            vacio="Todavía no hay comités registrados."
-          />
-        </div>
-      </section>
+      <ListaComites cuentas={cuentas} urlLogin={urlLogin} />
     </div>
   );
 }

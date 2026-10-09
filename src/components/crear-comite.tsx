@@ -80,7 +80,7 @@ export function CrearComite({ urlLogin }: { urlLogin: string | null }) {
   }
 
   return (
-    <div className="rounded-xl border border-black/[0.1] p-5 dark:border-white/[0.14]">
+    <div className="w-full basis-full rounded-xl border border-black/[0.1] bg-white p-5 dark:border-white/[0.14] dark:bg-[#111]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold">
