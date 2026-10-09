@@ -151,6 +151,41 @@ async function filas<T>(
   }
 }
 
+export type LecturasComite = {
+  id: string;
+  nombre: string;
+  total: number;
+  pendientes: number;
+  ultimos30: number;
+  ultima: Date | null;
+};
+
+/** Cuántas lecturas tiene cada comité, y cuántas esperan aprobación. */
+export async function lecturasPorComite(): Promise<LecturasComite[]> {
+  const rows = await filas<{
+    id: string;
+    nombre: string;
+    total: number;
+    pendientes: number;
+    ultimos30: number;
+    ultima: string | null;
+  }>(
+    dbFacilagua,
+    `select a.id, a.nombre,
+       count(l.id)::int as total,
+       (count(l.id) filter (where l.estado = 'PENDIENTE'))::int as pendientes,
+       (count(l.id) filter (where l."createdAt" > now() - interval '30 days'))::int as ultimos30,
+       max(l."createdAt") as ultima
+     from "Apr" a
+     left join "Socio" s on s."aprId" = a.id
+     left join "Lectura" l on l."socioId" = s.id
+     group by a.id, a.nombre
+     order by pendientes desc, ultima desc nulls last, a.nombre`
+  );
+
+  return rows.map((r) => ({ ...r, ultima: r.ultima ? new Date(r.ultima) : null }));
+}
+
 /** Los comités de Facilapr, del más activo al más dormido. */
 export async function cuentasFacilagua(): Promise<Cuenta[]> {
   const rows = await filas<{

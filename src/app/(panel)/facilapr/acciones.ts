@@ -83,6 +83,7 @@ export async function crearComite(
     };
   }
 
-  revalidatePath("/facilagua");
+  revalidatePath("/facilapr");
+  revalidatePath("/facilapr/comites");
   return json;
 }

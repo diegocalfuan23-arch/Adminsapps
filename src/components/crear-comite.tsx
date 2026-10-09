@@ -6,7 +6,7 @@ import {
   crearComite,
   type DatosComite,
   type ResultadoCrearComite,
-} from "@/app/(panel)/facilagua/acciones";
+} from "@/app/(panel)/facilapr/acciones";
 
 type Exito = Extract<ResultadoCrearComite, { ok: true }>;
 
