@@ -20,9 +20,9 @@ export default async function DireccionesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Direcciones</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Enlaces</h1>
         <p className="mt-1 text-sm text-black/55 dark:text-white/55">
-          El slug de cada comité, que puedes editar, y el enlace de su portal de socios.{" "}
+          El slug de cada comité (su nombre dentro de Facilapr, editable) y el enlace de su portal de socios.{" "}
           {conSlug} de {comites.length} tienen slug.
         </p>
       </div>

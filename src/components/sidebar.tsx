@@ -36,7 +36,7 @@ const ENLACES_FACILAPR: Enlace[] = [
   { href: "/facilapr", etiqueta: "Resumen", icono: LayoutDashboard, exacto: true },
   { href: "/facilapr/comites", etiqueta: "Comités", icono: Users },
   { href: "/facilapr/lecturas", etiqueta: "Lecturas", icono: Droplets },
-  { href: "/facilapr/direcciones", etiqueta: "Direcciones", icono: Link2 },
+  { href: "/facilapr/direcciones", etiqueta: "Enlaces", icono: Link2 },
   { href: "/consultas", etiqueta: "Consultas", icono: Inbox },
 ];
 
