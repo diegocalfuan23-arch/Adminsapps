@@ -423,3 +423,28 @@ export async function consultasFacilagua(): Promise<ConsultaFacilagua[]> {
 
   return rows.map((r) => ({ ...r, createdAt: new Date(r.createdAt) }));
 }
+
+export type DireccionComite = {
+  id: string;
+  nombre: string;
+  /** Lo que va en la dirección del comité; null mientras no se haya definido. */
+  slug: string | null;
+  plan: string;
+  sitioPublicado: boolean;
+  dominioPropio: string | null;
+  /** Socios que ya crearon su cuenta en el portal. */
+  conCuenta: number;
+};
+
+/** La dirección (slug) de cada comité y el estado de su sitio y su portal. */
+export async function direccionesFacilapr(): Promise<DireccionComite[]> {
+  return filas<DireccionComite>(
+    dbFacilagua,
+    `select a.id, a.nombre, a.slug, a.plan::text as plan,
+       a."sitioPublicado", a."dominioPropio",
+       (select count(*)::int from "Socio" s
+          where s."aprId" = a.id and s."userId" is not null) as "conCuenta"
+     from "Apr" a
+     order by (a.slug is null), a.slug, a.nombre`
+  );
+}
