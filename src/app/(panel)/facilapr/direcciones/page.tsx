@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { CopiarTexto } from "@/components/copiar-texto";
+import { EditarSlug } from "@/components/editar-slug";
 import { direccionesFacilapr } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export default async function DireccionesPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Direcciones</h1>
         <p className="mt-1 text-sm text-black/55 dark:text-white/55">
-          El slug de cada comité y el enlace de su portal de socios.{" "}
+          El slug de cada comité, que puedes editar, y el enlace de su portal de socios.{" "}
           {conSlug} de {comites.length} tienen slug.
         </p>
       </div>
@@ -52,14 +53,7 @@ export default async function DireccionesPage() {
                   <tr key={c.id}>
                     <td className="px-4 py-3 font-medium">{c.nombre.trim()}</td>
                     <td className="px-4 py-3">
-                      {c.slug ? (
-                        <span className="inline-flex items-center gap-1">
-                          <code className="font-mono text-[0.82rem]">{c.slug}</code>
-                          <CopiarTexto texto={c.slug} etiqueta="Copiar el slug" />
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 dark:text-amber-400">Sin slug</span>
-                      )}
+                      <EditarSlug aprId={c.id} slug={c.slug} />
                     </td>
                     <td className="px-4 py-3">
                       {portal ? (

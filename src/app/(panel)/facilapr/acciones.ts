@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { llamarFacilapr } from "@/lib/facilapr";
 
 export type DatosComite = {
   nombre: string;
@@ -86,4 +87,27 @@ export async function crearComite(
   revalidatePath("/facilapr");
   revalidatePath("/facilapr/comites");
   return json;
+}
+
+/**
+ * Cambia la dirección (slug) de un comité. Como todo lo demás, la escritura la
+ * hace Facilapr por su API interna, con sus mismas reglas (formato, palabras
+ * reservadas y que no la use otro comité).
+ */
+export async function cambiarSlugComite(
+  aprId: string,
+  slug: string
+): Promise<{ ok: true; slug: string } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr<{ slug: string }>("/api/interno/slug", {
+    aprId,
+    slug,
+  });
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/direcciones");
+  revalidatePath("/facilapr/comites");
+  return { ok: true, slug: r.datos.slug };
 }
