@@ -111,3 +111,26 @@ export async function cambiarSlugComite(
   revalidatePath("/facilapr/comites");
   return { ok: true, slug: r.datos.slug };
 }
+
+/**
+ * Cambia el plan de un comité. Como todo lo demás, la escritura la hace
+ * Facilapr por su API interna: el panel no escribe en su base.
+ */
+export async function cambiarPlanComite(
+  aprId: string,
+  plan: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  if (!["BASICO", "ESTANDAR", "PREMIUM"].includes(plan)) {
+    return { ok: false, error: "Plan no válido." };
+  }
+
+  const r = await llamarFacilapr<{ plan: string }>("/api/interno/plan", { aprId, plan });
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/comites");
+  revalidatePath("/facilapr/direcciones");
+  return { ok: true };
+}

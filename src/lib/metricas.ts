@@ -137,6 +137,8 @@ export type Cuenta = {
   detalle: string;
   /** Solo mecanicoapp por ahora: prueba · taller · serviteca · empresarial. */
   plan?: string;
+  /** Plan de un comité de Facilapr: BASICO · ESTANDAR · PREMIUM. */
+  planComite?: string;
 };
 
 async function filas<T>(
@@ -192,6 +194,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     id: string;
     nombre: string;
     comuna: string | null;
+    plan: string;
     correo: string | null;
     registrada: string;
     activo: boolean;
@@ -200,7 +203,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     ultima: string | null;
   }>(
     dbFacilagua,
-    `select a.id, a.nombre, a.comuna, a."createdAt" as registrada, a.activo,
+    `select a.id, a.nombre, a.comuna, a.plan::text as plan, a."createdAt" as registrada, a.activo,
        (select u.email from "user" u
           where u."aprId" = a.id and u.rol = 'ADMIN'
           order by u."createdAt" asc limit 1) as correo,
@@ -229,6 +232,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     registrada: new Date(r.registrada),
     ultimaActividad: r.ultima ? new Date(r.ultima) : null,
     activo: r.activo,
+    planComite: r.plan,
     detalle: [
       r.comuna,
       `${r.socios} ${r.socios === 1 ? "socio" : "socios"}`,

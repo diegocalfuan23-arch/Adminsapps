@@ -1,5 +1,6 @@
 import type { Cuenta } from "@/lib/metricas";
 import { SelectorPlan } from "@/components/selector-plan";
+import { SelectorPlanComite } from "@/components/selector-plan-comite";
 
 const FECHA = new Intl.DateTimeFormat("es-CL", {
   day: "2-digit",
@@ -64,7 +65,9 @@ export function ListaCuentas({
   // La columna "Plan" solo aparece si al menos una cuenta lo trae —
   // hoy solo mecanicoapp lo tiene, FacilAgua no debe mostrar la
   // columna ni el selector.
-  const conPlan = cuentas.some((c) => c.plan !== undefined);
+  const conPlan = cuentas.some(
+    (c) => c.plan !== undefined || c.planComite !== undefined
+  );
   const columnas = conPlan
     ? ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle", "Plan"]
     : ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle"];
@@ -114,8 +117,12 @@ export function ListaCuentas({
               </td>
               {conPlan && (
                 <td className="px-4 py-3 whitespace-nowrap">
-                  {c.plan !== undefined && (
-                    <SelectorPlan userId={c.id} planActual={c.plan} />
+                  {c.planComite !== undefined ? (
+                    <SelectorPlanComite aprId={c.id} planActual={c.planComite} />
+                  ) : (
+                    c.plan !== undefined && (
+                      <SelectorPlan userId={c.id} planActual={c.plan} />
+                    )
                   )}
                 </td>
               )}
