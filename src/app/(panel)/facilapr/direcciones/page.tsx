@@ -6,9 +6,9 @@ import { direccionesFacilapr } from "@/lib/metricas";
 export const dynamic = "force-dynamic";
 
 const PLAN: Record<string, string> = {
-  BASICO: "Básico",
+  BASICO: "Pequeño",
   ESTANDAR: "Estándar",
-  PREMIUM: "Premium",
+  PREMIUM: "Grande",
 };
 
 export default async function DireccionesPage() {

@@ -11,9 +11,9 @@ import {
 type Exito = Extract<ResultadoCrearComite, { ok: true }>;
 
 const PLANES: { valor: DatosComite["plan"]; texto: string }[] = [
-  { valor: "BASICO", texto: "Básico" },
+  { valor: "BASICO", texto: "Pequeño" },
   { valor: "ESTANDAR", texto: "Estándar" },
-  { valor: "PREMIUM", texto: "Premium" },
+  { valor: "PREMIUM", texto: "Grande" },
 ];
 
 const campoClase =
