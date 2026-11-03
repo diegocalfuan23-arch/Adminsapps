@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { llamarFacilapr } from "@/lib/facilapr";
+import { llamarFacilapr, subirAFacilapr } from "@/lib/facilapr";
 
 export type DatosComite = {
   nombre: string;
@@ -133,4 +133,59 @@ export async function cambiarPlanComite(
   revalidatePath("/facilapr/comites");
   revalidatePath("/facilapr/direcciones");
   return { ok: true };
+}
+
+export type FilaLecturaVista = {
+  linea: number;
+  referencia: string;
+  valor: number | null;
+  socioId: string | null;
+  nombre: string | null;
+  anterior: number | null;
+  consumo: number | null;
+  error: string | null;
+};
+
+export type VistaLecturas = {
+  modo: "inicial" | "mensual";
+  periodo: string;
+  notas: string[];
+  filas: FilaLecturaVista[];
+};
+
+/**
+ * Paso 1 de cargar lecturas a un comité: Facilapr lee la planilla y dice a qué
+ * arranque corresponde cada una. No guarda nada.
+ */
+export async function previsualizarLecturasComite(
+  formData: FormData
+): Promise<{ ok: true; vista: VistaLecturas } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await subirAFacilapr<VistaLecturas>("/api/interno/lecturas", formData);
+  if (!r.ok) return { ok: false, error: r.error };
+  return { ok: true, vista: r.datos };
+}
+
+/** Paso 2: guarda las lecturas confirmadas. Facilapr vuelve a validarlas con sus reglas. */
+export async function confirmarLecturasComite(
+  aprId: string,
+  items: { socioId: string; valor: number }[],
+  periodo: string,
+  modo: "inicial" | "mensual"
+): Promise<{ ok: true; cargadas: number } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr<{ cargadas: number }>("/api/interno/lecturas", {
+    aprId,
+    items,
+    periodo,
+    modo,
+  });
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/lecturas");
+  return { ok: true, cargadas: r.datos.cargadas };
 }

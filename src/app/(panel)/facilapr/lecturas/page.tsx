@@ -1,3 +1,4 @@
+import { CargarLecturas } from "@/components/cargar-lecturas";
 import { lecturasPorComite } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
@@ -53,6 +54,15 @@ export default async function LecturasPage() {
           </div>
         ))}
       </div>
+
+      <section>
+        <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">
+          Cargar lecturas a un comité
+        </h2>
+        <div className="mt-3">
+          <CargarLecturas comites={comites.map((c) => ({ id: c.id, nombre: c.nombre }))} />
+        </div>
+      </section>
 
       <section>
         <h2 className="font-mono text-[0.72rem] font-semibold tracking-[0.09em] text-black/50 uppercase dark:text-white/50">

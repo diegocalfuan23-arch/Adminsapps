@@ -8,9 +8,27 @@ export type RespuestaFacilapr<T> =
   | { ok: true; datos: T }
   | { ok: false; error: string; campo?: string };
 
-export async function llamarFacilapr<T>(
+export function llamarFacilapr<T>(
   ruta: string,
   cuerpo: unknown
+): Promise<RespuestaFacilapr<T>> {
+  return pedirAFacilapr<T>(ruta, {
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(cuerpo),
+  });
+}
+
+/** Igual que llamarFacilapr, pero para enviar un archivo (multipart). */
+export function subirAFacilapr<T>(
+  ruta: string,
+  formulario: FormData
+): Promise<RespuestaFacilapr<T>> {
+  return pedirAFacilapr<T>(ruta, { body: formulario });
+}
+
+async function pedirAFacilapr<T>(
+  ruta: string,
+  { headers, body }: { headers?: Record<string, string>; body: BodyInit }
 ): Promise<RespuestaFacilapr<T>> {
   const url = process.env.FACILAPR_URL;
   const secreto = process.env.FACILAPR_API_SECRET;
@@ -26,8 +44,8 @@ export async function llamarFacilapr<T>(
   try {
     respuesta = await fetch(new URL(ruta, url), {
       method: "POST",
-      headers: { "content-type": "application/json", "x-api-secret": secreto },
-      body: JSON.stringify(cuerpo),
+      headers: { ...headers, "x-api-secret": secreto },
+      body,
       cache: "no-store",
       signal: AbortSignal.timeout(25_000),
     });
