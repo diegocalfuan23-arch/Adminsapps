@@ -21,9 +21,28 @@ function diasHasta(fecha: Date) {
   return Math.max(0, Math.ceil((fecha.getTime() - Date.now()) / 86_400_000));
 }
 
+/** Día y hora exactos en Chile: «7 nov, 15:34». */
+const FECHA_HORA = new Intl.DateTimeFormat("es-CL", {
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Santiago",
+});
+
 /** Cuántos días pasaron desde la última señal de vida. */
 function diasDesde(fecha: Date) {
   return Math.floor((Date.now() - fecha.getTime()) / 86_400_000);
+}
+
+/** Hace cuánto fue algo, con la precisión que importa: minutos, horas o días. */
+function hace(fecha: Date) {
+  const min = Math.max(0, Math.floor((Date.now() - fecha.getTime()) / 60_000));
+  if (min < 1) return "ahora";
+  if (min < 60) return `hace ${min} min`;
+  if (min < 1440) return `hace ${Math.floor(min / 60)} h`;
+  const dias = Math.floor(min / 1440);
+  return dias === 1 ? "ayer" : `hace ${dias} días`;
 }
 
 function Actividad({ ultima }: { ultima: Date | null }) {
@@ -36,8 +55,7 @@ function Actividad({ ultima }: { ultima: Date | null }) {
   }
 
   const dias = diasDesde(ultima);
-  const texto =
-    dias === 0 ? "hoy" : dias === 1 ? "ayer" : `hace ${dias} días`;
+  const texto = hace(ultima);
 
   // Más de dos semanas sin tocar nada es una cuenta abandonada, y eso
   // importa más que la fecha exacta.
@@ -52,6 +70,24 @@ function Actividad({ ultima }: { ultima: Date | null }) {
       }
     >
       {texto}
+      <span className="block text-[0.75rem] tabular-nums text-black/40 dark:text-white/40">
+        {FECHA_HORA.format(ultima)}
+      </span>
+    </span>
+  );
+}
+
+/** El último ingreso de quien administra el comité, con día y hora exactos. */
+function Ingreso({ fecha }: { fecha: Date | null | undefined }) {
+  if (!fecha) {
+    return <span className="text-black/35 dark:text-white/35">Nunca entró</span>;
+  }
+  return (
+    <span className="text-black/55 dark:text-white/55">
+      {hace(fecha)}
+      <span className="block text-[0.75rem] tabular-nums text-black/40 dark:text-white/40">
+        {FECHA_HORA.format(fecha)}
+      </span>
     </span>
   );
 }
@@ -100,6 +136,7 @@ export function ListaCuentas({
     "Correo",
     "Registrado",
     "Última actividad",
+    ...(conResponsable ? ["Último ingreso"] : []),
     "Detalle",
     ...(conPlan ? ["Plan"] : []),
   ];
@@ -153,6 +190,11 @@ export function ListaCuentas({
               <td className="px-4 py-3 whitespace-nowrap">
                 <Actividad ultima={c.ultimaActividad} />
               </td>
+              {conResponsable && (
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <Ingreso fecha={c.ultimoIngreso} />
+                </td>
+              )}
               <td className="px-4 py-3 text-black/55 dark:text-white/55">
                 {c.detalle}
               </td>
