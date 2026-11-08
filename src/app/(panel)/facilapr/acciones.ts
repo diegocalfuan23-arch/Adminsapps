@@ -123,11 +123,15 @@ export async function cambiarPlanComite(
   const sesion = await auth.api.getSession({ headers: await headers() });
   if (!sesion) return { ok: false, error: "Sin sesión." };
 
-  if (!["BASICO", "ESTANDAR", "PREMIUM"].includes(plan)) {
+  if (!["BASICO", "ESTANDAR", "PREMIUM", "PRUEBA"].includes(plan)) {
     return { ok: false, error: "Plan no válido." };
   }
 
-  const r = await llamarFacilapr<{ plan: string }>("/api/interno/plan", { aprId, plan });
+  // «PRUEBA» inicia la prueba gratuita de 10 días (Facilapr la deja como plan Grande con fecha de término).
+  const r = await llamarFacilapr<{ plan: string }>(
+    "/api/interno/plan",
+    plan === "PRUEBA" ? { aprId, plan: "PREMIUM", prueba: true } : { aprId, plan }
+  );
   if (!r.ok) return { ok: false, error: r.error };
 
   revalidatePath("/facilapr/comites");

@@ -139,6 +139,12 @@ export type Cuenta = {
   plan?: string;
   /** Plan de un comité de Facilapr: BASICO · ESTANDAR · PREMIUM. */
   planComite?: string;
+  /** Solo Facilapr: hasta cuándo dura su prueba gratuita (null si no está en prueba). */
+  pruebaHasta?: Date | null;
+  /** Solo Facilapr: quien administra el comité, con su cargo (como lo escribió al registrarse). */
+  responsable?: string | null;
+  /** Solo Facilapr: el teléfono del comité, si lo completó en Configuración. */
+  telefono?: string | null;
 };
 
 async function filas<T>(
@@ -196,6 +202,9 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     comuna: string | null;
     plan: string;
     correo: string | null;
+    responsable: string | null;
+    telefono: string | null;
+    prueba_hasta: string | null;
     registrada: string;
     activo: boolean;
     socios: number;
@@ -207,6 +216,11 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
        (select u.email from "user" u
           where u."aprId" = a.id and u.rol = 'ADMIN'
           order by u."createdAt" asc limit 1) as correo,
+       (select u.name || ' · ' || u.cargo from "user" u
+          where u."aprId" = a.id and u.rol = 'ADMIN'
+          order by u."createdAt" asc limit 1) as responsable,
+       a.telefono as telefono,
+       a."pruebaHasta" as prueba_hasta,
        (select count(*)::int from "Socio" s where s."aprId" = a.id) as socios,
        (select count(*)::int from "Boleta" b
           join "Socio" s on s.id = b."socioId" where s."aprId" = a.id) as boletas,
@@ -233,6 +247,9 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     ultimaActividad: r.ultima ? new Date(r.ultima) : null,
     activo: r.activo,
     planComite: r.plan,
+    pruebaHasta: r.prueba_hasta ? new Date(r.prueba_hasta) : null,
+    responsable: r.responsable,
+    telefono: r.telefono,
     detalle: [
       r.comuna,
       `${r.socios} ${r.socios === 1 ? "socio" : "socios"}`,

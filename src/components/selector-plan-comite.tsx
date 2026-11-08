@@ -7,6 +7,8 @@ const PLANES = [
   { valor: "BASICO", texto: "Pequeño" },
   { valor: "ESTANDAR", texto: "Estándar" },
   { valor: "PREMIUM", texto: "Grande" },
+  // No es un plan: deja el comité con todas las funciones por 10 días y luego vuelve al plan Pequeño.
+  { valor: "PRUEBA", texto: "Prueba 10 días" },
 ];
 
 /** El plan de un comité de Facilapr. El cambio lo hace Facilapr, por su API interna. */
@@ -30,6 +32,9 @@ export function SelectorPlanComite({
       if (!r.ok) {
         setPlan(anterior);
         setError(r.error);
+      } else if (nuevo === "PRUEBA") {
+        // La prueba deja el comité en plan Grande; la insignia de al lado dice cuántos días le quedan.
+        setPlan("PREMIUM");
       }
     });
   }

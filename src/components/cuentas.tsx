@@ -8,6 +8,11 @@ const FECHA = new Intl.DateTimeFormat("es-CL", {
   year: "numeric",
 });
 
+/** Cuántos días faltan para una fecha futura (0 si ya pasó). */
+function diasHasta(fecha: Date) {
+  return Math.max(0, Math.ceil((fecha.getTime() - Date.now()) / 86_400_000));
+}
+
 /** Cuántos días pasaron desde la última señal de vida. */
 function diasDesde(fecha: Date) {
   return Math.floor((Date.now() - fecha.getTime()) / 86_400_000);
@@ -43,6 +48,17 @@ function Actividad({ ultima }: { ultima: Date | null }) {
   );
 }
 
+/** Si el comité está en su prueba gratuita, cuántos días le quedan. */
+function InsigniaPrueba({ hasta }: { hasta: Date | null }) {
+  const dias = hasta ? diasHasta(hasta) : 0;
+  if (dias <= 0) return null;
+  return (
+    <span className="mt-1 inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[0.7rem] font-medium text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
+      Prueba · {dias} {dias === 1 ? "día" : "días"}
+    </span>
+  );
+}
+
 /**
  * Quién se registró, cuándo, y si sigue usando el producto. Los conteos
  * totales no distinguen entre diez cuentas activas y diez abandonadas.
@@ -68,9 +84,17 @@ export function ListaCuentas({
   const conPlan = cuentas.some(
     (c) => c.plan !== undefined || c.planComite !== undefined
   );
-  const columnas = conPlan
-    ? ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle", "Plan"]
-    : ["Nombre", "Correo", "Registrado", "Última actividad", "Detalle"];
+  // La columna "Responsable" también es solo de Facilapr: quién se registró y cómo contactarlo.
+  const conResponsable = cuentas.some((c) => c.responsable !== undefined);
+  const columnas = [
+    "Nombre",
+    ...(conResponsable ? ["Responsable"] : []),
+    "Correo",
+    "Registrado",
+    "Última actividad",
+    "Detalle",
+    ...(conPlan ? ["Plan"] : []),
+  ];
 
   return (
     <div className="overflow-x-auto rounded-xl border border-black/[0.08] dark:border-white/[0.12]">
@@ -101,6 +125,14 @@ export function ListaCuentas({
                   </span>
                 )}
               </td>
+              {conResponsable && (
+                <td className="px-4 py-3 whitespace-nowrap text-black/55 dark:text-white/55">
+                  {c.responsable ?? (
+                    <span className="text-black/30 dark:text-white/30">—</span>
+                  )}
+                  {c.telefono && <span className="block text-[0.75rem] tabular-nums">{c.telefono}</span>}
+                </td>
+              )}
               <td className="px-4 py-3 whitespace-nowrap text-black/55 dark:text-white/55">
                 {c.correo ?? (
                   <span className="text-black/30 dark:text-white/30">—</span>
@@ -118,7 +150,10 @@ export function ListaCuentas({
               {conPlan && (
                 <td className="px-4 py-3 whitespace-nowrap">
                   {c.planComite !== undefined ? (
-                    <SelectorPlanComite aprId={c.id} planActual={c.planComite} />
+                    <>
+                      <SelectorPlanComite aprId={c.id} planActual={c.planComite} />
+                      <InsigniaPrueba hasta={c.pruebaHasta ?? null} />
+                    </>
                   ) : (
                     c.plan !== undefined && (
                       <SelectorPlan userId={c.id} planActual={c.plan} />
