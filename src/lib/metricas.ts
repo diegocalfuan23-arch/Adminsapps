@@ -212,7 +212,7 @@ export async function cuentasFacilagua(): Promise<Cuenta[]> {
     ultima: string | null;
   }>(
     dbFacilagua,
-    `select a.id, a.nombre, a.comuna, a.plan::text as plan, a."createdAt" as registrada, a.activo,
+    `select a.id, a.nombre, a.comuna, a.plan::text as plan, (a."createdAt" at time zone 'UTC') as registrada, a.activo,
        (select u.email from "user" u
           where u."aprId" = a.id and u.rol = 'ADMIN'
           order by u."createdAt" asc limit 1) as correo,

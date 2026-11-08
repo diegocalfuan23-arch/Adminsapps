@@ -6,6 +6,7 @@ const FECHA = new Intl.DateTimeFormat("es-CL", {
   day: "2-digit",
   month: "short",
   year: "numeric",
+  timeZone: "America/Santiago",
 });
 
 /** La hora en Chile: sirve para saber cuándo se registró alguien, además del día. */
