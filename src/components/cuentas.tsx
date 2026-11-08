@@ -8,6 +8,13 @@ const FECHA = new Intl.DateTimeFormat("es-CL", {
   year: "numeric",
 });
 
+/** La hora en Chile: sirve para saber cuándo se registró alguien, además del día. */
+const HORA = new Intl.DateTimeFormat("es-CL", {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Santiago",
+});
+
 /** Cuántos días faltan para una fecha futura (0 si ya pasó). */
 function diasHasta(fecha: Date) {
   return Math.max(0, Math.ceil((fecha.getTime() - Date.now()) / 86_400_000));
@@ -140,6 +147,7 @@ export function ListaCuentas({
               </td>
               <td className="px-4 py-3 whitespace-nowrap tabular-nums text-black/55 dark:text-white/55">
                 {FECHA.format(c.registrada)}
+                <span className="block text-[0.75rem]">{HORA.format(c.registrada)}</span>
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <Actividad ultima={c.ultimaActividad} />
