@@ -3,7 +3,8 @@ import { cuentasFacilagua } from "@/lib/metricas";
 
 export const dynamic = "force-dynamic";
 
-export default async function ComitesPage() {
+export default async function ComitesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q = "" } = await searchParams;
   const cuentas = await cuentasFacilagua();
 
   const urlLogin = process.env.FACILAPR_URL
@@ -19,7 +20,7 @@ export default async function ComitesPage() {
         </p>
       </div>
 
-      <ListaComites cuentas={cuentas} urlLogin={urlLogin} />
+      <ListaComites key={q} inicial={q} cuentas={cuentas} urlLogin={urlLogin} />
     </div>
   );
 }

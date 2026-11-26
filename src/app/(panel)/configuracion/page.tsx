@@ -63,7 +63,7 @@ export default function ConfiguracionPage() {
           Configuración
         </h2>
 
-        <ul className="mt-4 flex flex-col divide-y divide-black/[0.06] rounded-xl border border-black/[0.08] dark:divide-white/[0.08] dark:border-white/[0.12]">
+        <ul className="mt-4 flex flex-col divide-y divide-black/[0.06] rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:divide-white/[0.08] dark:border-white/[0.12]">
           {requisitos.map((r) => (
             <li key={r.variable} className="flex items-start gap-3 p-4">
               <span

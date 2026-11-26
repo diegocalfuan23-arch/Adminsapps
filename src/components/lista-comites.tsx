@@ -10,11 +10,14 @@ import { CrearComite } from "@/components/crear-comite";
 export function ListaComites({
   cuentas,
   urlLogin,
+  inicial = "",
 }: {
   cuentas: Cuenta[];
   urlLogin: string | null;
+  /** Lo que venía escrito en el buscador de la barra de arriba. */
+  inicial?: string;
 }) {
-  const [busqueda, setBusqueda] = useState("");
+  const [busqueda, setBusqueda] = useState(inicial);
 
   const filtradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase();

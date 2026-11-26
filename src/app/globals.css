@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+/* La consola es clara: las variantes «dark:» solo aplicarían con la clase .dark, que no se usa. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7fa;
+  --foreground: #18181b;
 }
 
 @theme inline {
@@ -13,13 +16,6 @@
     "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono",
     Menlo, Consolas, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

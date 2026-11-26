@@ -458,18 +458,15 @@ export type DireccionComite = {
   /** Lo que va en la dirección del comité; null mientras no se haya definido. */
   slug: string | null;
   plan: string;
-  sitioPublicado: boolean;
-  dominioPropio: string | null;
   /** Socios que ya crearon su cuenta en el portal. */
   conCuenta: number;
 };
 
-/** La dirección (slug) de cada comité y el estado de su sitio y su portal. */
+/** La dirección (slug) de cada comité y el estado de su portal. */
 export async function direccionesFacilapr(): Promise<DireccionComite[]> {
   return filas<DireccionComite>(
     dbFacilagua,
     `select a.id, a.nombre, a.slug, a.plan::text as plan,
-       a."sitioPublicado", a."dominioPropio",
        (select count(*)::int from "Socio" s
           where s."aprId" = a.id and s."userId" is not null) as "conCuenta"
      from "Apr" a

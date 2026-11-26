@@ -1,7 +1,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { Sidebar } from "@/components/sidebar";
+import { Marco } from "@/components/consola/marco";
+import { avisosMenu } from "@/lib/consola";
 
 /**
  * Todas las páginas del panel cuelgan de aquí, así que la sesión se valida
@@ -14,10 +15,11 @@ export default async function PanelLayout({
   const sesion = await auth.api.getSession({ headers: await headers() });
   if (!sesion) redirect("/entrar");
 
+  const avisos = await avisosMenu();
+
   return (
-    <div className="flex min-h-full flex-1 flex-col md:flex-row">
-      <Sidebar />
-      <main className="min-w-0 flex-1 px-6 py-8 md:px-10">{children}</main>
-    </div>
+    <Marco avisos={avisos} sitio={process.env.FACILAPR_URL ?? "https://facilapr.cl"} usuario={sesion.user.name || "Administrador"}>
+      {children}
+    </Marco>
   );
 }

@@ -41,7 +41,7 @@ export default async function LecturasPage() {
         {tarjetas.map((t) => (
           <div
             key={t.etiqueta}
-            className="rounded-xl border border-black/[0.08] p-4 dark:border-white/[0.12]"
+            className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 dark:border-white/[0.12]"
           >
             <div className="text-[0.8rem] text-black/55 dark:text-white/55">{t.etiqueta}</div>
             <div
@@ -73,7 +73,7 @@ export default async function LecturasPage() {
             Todavía no hay comités.
           </p>
         ) : (
-          <div className="mt-3 overflow-x-auto rounded-xl border border-black/[0.08] dark:border-white/[0.12]">
+          <div className="mt-3 overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-white/[0.12]">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b border-black/[0.08] text-left font-mono text-[0.7rem] tracking-[0.08em] text-black/45 uppercase dark:border-white/[0.12] dark:text-white/45">

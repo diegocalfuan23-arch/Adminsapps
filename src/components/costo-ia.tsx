@@ -20,7 +20,7 @@ export function CostoIa({ datos }: { datos: CostoIaProducto }) {
         </p>
       ) : (
         <div className="mt-3 grid gap-4 lg:grid-cols-[auto_1fr_1fr]">
-          <div className="rounded-xl border border-black/[0.08] p-4 dark:border-white/[0.12]">
+          <div className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 dark:border-white/[0.12]">
             <div className="text-[0.8rem] text-black/55 dark:text-white/55">
               Total estimado
             </div>
@@ -32,7 +32,7 @@ export function CostoIa({ datos }: { datos: CostoIaProducto }) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-black/[0.08] p-4 dark:border-white/[0.12]">
+          <div className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 dark:border-white/[0.12]">
             <div className="text-[0.8rem] text-black/55 dark:text-white/55">
               Por origen
             </div>
@@ -59,7 +59,7 @@ export function CostoIa({ datos }: { datos: CostoIaProducto }) {
             )}
           </div>
 
-          <div className="rounded-xl border border-black/[0.08] p-4 dark:border-white/[0.12]">
+          <div className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 dark:border-white/[0.12]">
             <div className="text-[0.8rem] text-black/55 dark:text-white/55">
               Por comité (top 10)
             </div>

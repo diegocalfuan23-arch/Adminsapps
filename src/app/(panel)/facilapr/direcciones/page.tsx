@@ -32,14 +32,13 @@ export default async function DireccionesPage() {
           Todavía no hay comités.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-black/[0.08] dark:border-white/[0.12]">
+        <div className="overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-white/[0.12]">
           <table className="w-full min-w-[760px] text-sm">
             <thead>
               <tr className="border-b border-black/[0.08] text-left font-mono text-[0.7rem] tracking-[0.08em] text-black/45 uppercase dark:border-white/[0.12] dark:text-white/45">
                 <th className="px-4 py-3 font-medium">Comité</th>
                 <th className="px-4 py-3 font-medium">Slug</th>
                 <th className="px-4 py-3 font-medium">Portal de socios</th>
-                <th className="px-4 py-3 font-medium">Sitio</th>
                 <th className="px-4 py-3 font-medium">Plan</th>
                 <th className="px-4 py-3 text-right font-medium">Cuentas</th>
               </tr>
@@ -72,13 +71,6 @@ export default async function DireccionesPage() {
                       ) : (
                         <span className="text-black/30 dark:text-white/30">—</span>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-black/60 dark:text-white/60">
-                      {c.dominioPropio
-                        ? `Dominio propio · ${c.dominioPropio}`
-                        : c.sitioPublicado
-                          ? "Publicado"
-                          : "Borrador"}
                     </td>
                     <td className="px-4 py-3 text-black/60 dark:text-white/60">
                       {PLAN[c.plan] ?? c.plan}

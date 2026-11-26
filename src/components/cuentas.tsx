@@ -116,7 +116,7 @@ export function ListaCuentas({
 }) {
   if (cuentas.length === 0) {
     return (
-      <p className="rounded-xl border border-black/[0.08] p-4 text-sm text-black/45 dark:border-white/[0.12] dark:text-white/45">
+      <p className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 text-sm text-black/45 dark:border-white/[0.12] dark:text-white/45">
         {vacio}
       </p>
     );
@@ -142,7 +142,7 @@ export function ListaCuentas({
   ];
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-black/[0.08] dark:border-white/[0.12]">
+    <div className="overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-white/[0.12]">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-black/[0.08] text-left dark:border-white/[0.12]">

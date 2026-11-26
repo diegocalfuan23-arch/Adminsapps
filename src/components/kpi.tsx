@@ -2,7 +2,7 @@ import type { Metrica, MetricasProducto } from "@/lib/metricas";
 
 function Tarjeta({ etiqueta, valor, detalle }: Metrica) {
   return (
-    <div className="rounded-xl border border-black/[0.08] p-4 dark:border-white/[0.12]">
+    <div className="rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-4 dark:border-white/[0.12]">
       <div className="text-[0.8rem] text-black/55 dark:text-white/55">
         {etiqueta}
       </div>

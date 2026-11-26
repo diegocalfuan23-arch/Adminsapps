@@ -71,10 +71,10 @@ export function CrearComite({ urlLogin }: { urlLogin: string | null }) {
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-black px-3 py-2 text-sm font-medium text-white dark:bg-white dark:text-black"
+        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#3A0CE3] px-4 text-[13.5px] font-semibold text-white shadow-[0_6px_16px_rgba(58,12,227,0.25)] hover:bg-[#3209C9] sm:flex-none"
       >
         <Plus className="size-4" />
-        Crear comité
+        Nuevo comité
       </button>
     );
   }
