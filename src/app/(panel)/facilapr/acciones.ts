@@ -195,6 +195,46 @@ export async function confirmarLecturasComite(
   return { ok: true, cargadas: r.datos.cargadas };
 }
 
+/** «Aprobar» o «Pedir cambios» sobre las instrucciones que propuso una directiva. */
+export async function revisarInstrucciones(datos: {
+  aprId: string;
+  decision: "aprobar" | "cambios";
+  propuesta: string;
+  texto?: string;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr("/api/interno/asistente/revision", datos);
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/asistente");
+  return { ok: true };
+}
+
+/** Sube un documento de consulta (archivo o enlace). Facilapr saca el texto y lo guarda. */
+export async function subirDocumento(formData: FormData): Promise<{ ok: true } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await subirAFacilapr("/api/interno/asistente/documentos", formData);
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/asistente");
+  return { ok: true };
+}
+
+export async function borrarDocumento(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr("/api/interno/asistente/documentos/borrar", { id });
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/asistente");
+  return { ok: true };
+}
+
 /** Publica la base general del asistente y las instrucciones de los comités que cambiaron. Las escribe Facilapr. */
 export async function publicarAsistente(
   ajustes: Ajustes,

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Sparkles, Wrench, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Bot, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Wrench, X, type LucideIcon } from "lucide-react";
 import { Campana } from "@/components/consola/campana";
 import { signOut } from "@/lib/auth-client";
 import type { Avisos } from "@/lib/consola";
@@ -16,7 +16,7 @@ const FACILAPR: Item[] = [
   { href: "/facilapr", texto: "Resumen", icono: LayoutGrid, exacto: true },
   { href: "/facilapr/comites", texto: "Comités", icono: Building2, aviso: "comites" },
   { href: "/facilapr/lecturas", texto: "Lecturas", icono: Gauge, aviso: "lecturas" },
-  { href: "/facilapr/asistente", texto: "Asistente", icono: Sparkles },
+  { href: "/facilapr/asistente", texto: "Asistente", icono: Bot, aviso: "asistente" },
   { href: "/facilapr/direcciones", texto: "Enlaces", icono: Link2 },
   { href: "/consultas", texto: "Consultas", icono: Inbox, aviso: "consultas" },
 ];
@@ -151,7 +151,7 @@ export function Marco({ children, ...datos }: Datos & { children: React.ReactNod
           {dentro ? <Droplet className="size-3.5" fill="currentColor" /> : <LayoutGrid className="size-3.5" />}
         </span>
         <p className="text-[15px] font-semibold">{dentro ? "FacilAPR" : "Panel"}</p>
-        {dentro && <Campana hay={datos.avisos.comites + datos.avisos.lecturas + datos.avisos.consultas > 0} oscura className="ml-auto grid" />}
+        {dentro && <Campana hay={Object.values(datos.avisos).some((n) => n > 0)} oscura className="ml-auto grid" />}
       </div>
 
       {abierto && (

@@ -1,22 +1,30 @@
 "use client";
 
-import { Bot, Building2, ChevronDown, Lock, RotateCcw } from "lucide-react";
+import { Bot, Building2, ChevronDown, Lock, RotateCcw, Sparkles } from "lucide-react";
 import { Cabecera, ETIQUETA } from "@/components/consola/asistente/piezas";
 import { MAXIMO_INSTRUCCIONES_COMITE, type ComiteAsistente } from "@/lib/asistente-comun";
+
+export type EstadoInstrucciones = "personalizado" | "revisar" | "general";
 
 /** Lo que un comité agrega sobre la base general. */
 export function CapaComite({
   comite,
+  estado,
   instrucciones,
   general,
+  ocupado,
   onCambiar,
   onProbar,
+  onRevisar,
 }: {
   comite: ComiteAsistente;
+  estado: EstadoInstrucciones;
   instrucciones: string;
   general: string;
+  ocupado: boolean;
   onCambiar: (texto: string) => void;
   onProbar: () => void;
+  onRevisar: (decision: "aprobar" | "cambios") => void;
 }) {
   const datos: [string, string | null][] = [
     ["Horario", comite.horario],
@@ -24,15 +32,32 @@ export function CapaComite({
     ["Vencimiento", `${comite.diasVencimiento} días desde la emisión`],
     ["Cortes", `Con más de ${comite.diasGracia} días de atraso`],
   ];
+  const detalle =
+    estado === "general" ? "Solo usa la base general" : comite.editado ? `Editado ${comite.editado} por ${comite.autor}` : "Con instrucciones propias";
 
   return (
     <div>
-      <Cabecera icono={Building2} titulo={comite.nombre} detalle={instrucciones.trim() ? "Con instrucciones propias" : "Solo usa la base general"}>
+      <Cabecera icono={Building2} titulo={comite.nombre} detalle={detalle}>
         <button type="button" onClick={onProbar} className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#F3F2F8] px-3 text-[12.5px] font-semibold hover:bg-[#EAE6FF]">
           <Bot className="size-4" />
           Probar
         </button>
       </Cabecera>
+
+      {estado === "revisar" && (
+        <div className="mx-6 mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 sm:mx-8">
+          <Sparkles className="size-4 shrink-0 text-amber-600" aria-hidden />
+          <p className="min-w-0 flex-1 text-[13px] text-amber-900">La directiva cambió sus instrucciones. Revisa antes de que lleguen a los socios.</p>
+          <div className="flex gap-1.5">
+            <button type="button" disabled={ocupado} onClick={() => onRevisar("aprobar")} className="h-8 rounded-lg bg-[#110C2E] px-3 text-[12.5px] font-semibold text-white disabled:opacity-50">
+              Aprobar
+            </button>
+            <button type="button" disabled={ocupado} onClick={() => onRevisar("cambios")} className="h-8 rounded-lg bg-white px-3 text-[12.5px] font-semibold text-[#5E5A78] ring-1 ring-amber-200 disabled:opacity-50">
+              Pedir cambios
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6 px-6 py-6 sm:px-8">
         <details className="group rounded-2xl bg-[#F8F7FC] ring-1 ring-[#EEEBF6]">
@@ -41,18 +66,13 @@ export function CapaComite({
             Hereda la base general
             <ChevronDown className="ml-auto size-4 transition group-open:rotate-180" />
           </summary>
-          <p className="border-t border-[#EEEBF6] px-4 py-3 text-[12.5px] leading-relaxed break-words whitespace-pre-line text-[#8D89A6]">
-            {general.trim() || "Sin instrucciones generales."}
-          </p>
+          <p className="border-t border-[#EEEBF6] px-4 py-3 text-[12.5px] leading-relaxed break-words whitespace-pre-line text-[#8D89A6]">{general}</p>
         </details>
 
         <div>
-          <div className="flex items-baseline justify-between gap-3">
+          <div className="flex items-baseline justify-between">
             <span className={ETIQUETA}>Lo que agrega el comité</span>
-            <span className="ml-auto text-[11.5px] text-[#A3A0B8] tabular-nums">
-              {instrucciones.length}/{MAXIMO_INSTRUCCIONES_COMITE.toLocaleString("es-CL")}
-            </span>
-            {instrucciones && (
+            {estado !== "general" && (
               <button type="button" onClick={() => onCambiar("")} className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#8D89A6] hover:text-[#16132B]">
                 <RotateCcw className="size-3" />
                 Quitar

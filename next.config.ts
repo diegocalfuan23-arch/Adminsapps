@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Por defecto una acción de servidor acepta 1 MB: un documento o una planilla puede pasarlo.
+    // 4 MB es lo máximo que Vercel deja pasar en una petición.
+    serverActions: { bodySizeLimit: "4mb" },
+  },
+
   // Sin esto Next busca la raíz hacia arriba, encuentra los lockfiles de las
   // carpetas hermanas y avisa que no sabe cuál usar.
   turbopack: {

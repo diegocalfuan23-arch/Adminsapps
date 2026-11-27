@@ -105,7 +105,7 @@ export const DIAS_AVISO_PRUEBA = 3;
 export const pruebaPorVencer = (hasta: Date | null) =>
   Boolean(hasta && hasta.getTime() > Date.now() && hasta.getTime() - Date.now() <= DIAS_AVISO_PRUEBA * 86_400_000);
 
-export type Avisos = { comites: number; lecturas: number; consultas: number };
+export type Avisos = { comites: number; asistente: number; lecturas: number; consultas: number };
 
 /** Los números del menú. Si la base no responde, el menú se muestra sin ellos (la página ya avisa). */
 export async function avisosMenu(): Promise<Avisos> {
@@ -115,11 +115,12 @@ export async function avisosMenu(): Promise<Avisos> {
          (select count(*)::int from "Apr" where "pruebaHasta" > now() at time zone 'UTC'
             and "pruebaHasta" <= (now() at time zone 'UTC') + interval '${DIAS_AVISO_PRUEBA} days') as comites,
          (select count(distinct s."aprId")::int from "Lectura" l join "Socio" s on s.id = l."socioId" where l.estado::text = 'PENDIENTE') as lecturas,
-         (select count(*)::int from "Consulta" where estado::text = 'NUEVA') as consultas`
+         (select count(*)::int from "Consulta" where estado::text = 'NUEVA') as consultas,
+         (select count(*)::int from "AjustePlataforma" where clave like 'ia-comite:%' and valor::jsonb ->> 'pendiente' is not null) as asistente`
     );
     return fila;
   } catch (e) {
     console.error("Consola: no se pudieron leer los avisos:", e);
-    return { comites: 0, lecturas: 0, consultas: 0 };
+    return { comites: 0, asistente: 0, lecturas: 0, consultas: 0 };
   }
 }
