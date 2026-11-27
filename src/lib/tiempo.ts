@@ -2,8 +2,6 @@
 
 const ZONA = "America/Santiago";
 const DIA = new Intl.DateTimeFormat("en-CA", { timeZone: ZONA });
-const HORA = new Intl.DateTimeFormat("es-CL", { timeZone: ZONA, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
-const LARGO = new Intl.DateTimeFormat("es-CL", { timeZone: ZONA, weekday: "long", day: "numeric", month: "long" });
 
 export const MESES_CORTOS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 export const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -26,15 +24,13 @@ export function diasParaFinDeMes(hoy = diaEnChile()) {
   return total - Number(hoy.slice(8, 10));
 }
 
-export function fechaLarga(fecha = new Date()) {
-  const t = LARGO.format(fecha).replace(",", "");
-  return t.charAt(0).toUpperCase() + t.slice(1);
+/** Días completos entre una fecha y ahora, contados por el calendario de Chile. */
+export function diasDesde(fecha: Date) {
+  return Math.max(0, Math.round((Date.parse(diaEnChile()) - Date.parse(diaEnChile(fecha))) / 86_400_000));
 }
 
-export function saludo(fecha = new Date()) {
-  const hora = Number(HORA.format(fecha).slice(0, 2));
-  return hora >= 6 && hora < 12 ? "Buenos días" : hora >= 12 && hora < 20 ? "Buenas tardes" : "Buenas noches";
-}
+/** Cuántos días (redondeando hacia arriba) faltan para una fecha. */
+export const diasHasta = (fecha: Date) => Math.ceil((fecha.getTime() - Date.now()) / 86_400_000);
 
 /** «hace 12 min», «hace 3 h», «ayer», «hace 4 días». */
 export function hace(fecha: Date | null) {

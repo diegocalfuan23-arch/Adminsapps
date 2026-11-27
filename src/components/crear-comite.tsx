@@ -71,10 +71,11 @@ export function CrearComite({ urlLogin }: { urlLogin: string | null }) {
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#3A0CE3] px-4 text-[13.5px] font-semibold text-white shadow-[0_6px_16px_rgba(58,12,227,0.25)] hover:bg-[#3209C9] sm:flex-none"
+        aria-label="Nuevo comité"
+        className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#110C2E] px-4 text-[14px] font-semibold text-white transition hover:bg-[#241D52] sm:px-5"
       >
-        <Plus className="size-4" />
-        Nuevo comité
+        <Plus className="size-4" aria-hidden />
+        <span className="hidden sm:inline">Nuevo comité</span>
       </button>
     );
   }

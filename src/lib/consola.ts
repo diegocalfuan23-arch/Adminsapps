@@ -1,6 +1,7 @@
+import { cache } from "react";
 import { sql } from "drizzle-orm";
 import { dbFacilagua } from "@/lib/db";
-import { diaEnChile, ultimosMeses } from "@/lib/tiempo";
+import { diaEnChile, hace, nombreMes, ultimosMeses } from "@/lib/tiempo";
 
 /**
  * Lo que muestra la consola de Facilapr, leído de su base (solo lectura).
@@ -30,10 +31,16 @@ export type ComiteConsola = {
   pruebaHasta: Date | null;
   socios: number;
   boletas: number;
-  /** Socios activos con lectura este mes (sin las rechazadas). */
+  /**
+   * Socios activos con una lectura de este mes o cargada este mes (sin las rechazadas). Hay comités que facturan
+   * meses atrasados: si solo se mirara el periodo, uno que acaba de cargar todo figuraría «sin lecturas».
+   */
   leidos: number;
   pendientes: number;
-  ultima: Date | null;
+  /** Cuándo cargó lecturas por última vez. */
+  ultimaLectura: Date | null;
+  /** El teléfono del comité, si lo completó en Configuración. */
+  telefono: string | null;
   estado: EstadoComite;
 };
 
@@ -46,42 +53,35 @@ function estadoDe(c: { socios: number; leidos: number; pendientes: number }): Es
 export async function comitesConsola(): Promise<ComiteConsola[]> {
   const mes = diaEnChile().slice(0, 7);
   const delComite = (tabla: string, alias: string) => `from "${tabla}" ${alias} join "Socio" s on s.id = ${alias}."socioId" where s."aprId" = a.id`;
-  const filas = await leer<Omit<ComiteConsola, "estado" | "pruebaHasta" | "ultima"> & { prueba_hasta: string | null; ultima: string | null }>(
-    `select a.id, trim(a.nombre) as nombre, a.slug, a.comuna,
+  const filas = await leer<Omit<ComiteConsola, "estado" | "pruebaHasta" | "ultimaLectura"> & { prueba_hasta: string | null; ultima_lectura: string | null }>(
+    `select a.id, trim(a.nombre) as nombre, a.slug, a.comuna, a.telefono,
        ${mesDe(`a."createdAt"`)} as alta,
        (a."pruebaHasta" at time zone 'UTC') as prueba_hasta,
        (select count(*)::int from "Socio" s where s."aprId" = a.id and s.activo) as socios,
        (select count(*)::int ${delComite("Boleta", "b")} and b.estado::text <> 'ANULADA') as boletas,
-       (select count(distinct l."socioId")::int ${delComite("Lectura", "l")} and s.activo and l.periodo = '${mes}' and l.estado::text <> 'RECHAZADA') as leidos,
+       (select count(distinct l."socioId")::int ${delComite("Lectura", "l")} and s.activo and l.estado::text <> 'RECHAZADA'
+          and (l.periodo = '${mes}' or ${mesDe(`l."createdAt"`)} = '${mes}')) as leidos,
        (select count(*)::int ${delComite("Lectura", "l")} and l.estado::text = 'PENDIENTE') as pendientes,
-       (greatest(
-         (select max(b."createdAt") ${delComite("Boleta", "b")}),
-         (select max(l."createdAt") ${delComite("Lectura", "l")}),
-         (select max(s."createdAt") from "Socio" s where s."aprId" = a.id),
-         (select max(se."updatedAt") from session se join "user" u on u.id = se."userId" where u."aprId" = a.id)
-       ) at time zone 'UTC') as ultima
+       ((select max(l."createdAt") ${delComite("Lectura", "l")}) at time zone 'UTC') as ultima_lectura
      from "Apr" a
      order by socios desc, a.nombre`
   );
-  return filas.map(({ prueba_hasta, ultima, ...c }) => ({
+  return filas.map(({ prueba_hasta, ultima_lectura, ...c }) => ({
     ...c,
     pruebaHasta: prueba_hasta ? new Date(prueba_hasta) : null,
-    ultima: ultima ? new Date(ultima) : null,
+    ultimaLectura: ultima_lectura ? new Date(ultima_lectura) : null,
     estado: estadoDe(c),
   }));
 }
 
-export type Series = { meses: string[]; socios: number[]; boletas: number[]; lecturas: number[] };
+export type Series = { meses: string[]; socios: number[]; boletas: number[] };
 
 export async function seriesConsola(): Promise<Series> {
   const meses = ultimosMeses(6);
   const desde = meses[0];
-  const [altas, boletas, lecturas] = await Promise.all([
+  const [altas, boletas] = await Promise.all([
     leer<{ mes: string; n: number }>(`select ${mesDe(`"createdAt"`)} as mes, count(*)::int as n from "Socio" group by 1`),
     leer<{ mes: string; n: number }>(`select periodo as mes, count(*)::int as n from "Boleta" where estado::text <> 'ANULADA' and periodo >= '${desde}' group by 1`),
-    leer<{ mes: string; n: number }>(
-      `select periodo as mes, count(distinct "socioId")::int as n from "Lectura" where estado::text <> 'RECHAZADA' and periodo >= '${desde}' group by 1`
-    ),
   ]);
   const de = (filas: { mes: string; n: number }[], mes: string) => filas.find((f) => f.mes === mes)?.n ?? 0;
   return {
@@ -89,7 +89,6 @@ export async function seriesConsola(): Promise<Series> {
     // Socios que había al cerrar cada mes (los borrados no se cuentan).
     socios: meses.map((m) => altas.filter((a) => a.mes <= m).reduce((s, a) => s + a.n, 0)),
     boletas: meses.map((m) => de(boletas, m)),
-    lecturas: meses.map((m) => de(lecturas, m)),
   };
 }
 
@@ -115,10 +114,9 @@ export async function comitesQueBuscan(): Promise<Buscados> {
   return { comites: total?.comites ?? 0, busquedas: total?.busquedas ?? 0, recientes: recientes.map((r) => ({ ...r, fecha: new Date(r.fecha) })) };
 }
 
-export type Evento = { tipo: "alta" | "consulta" | "boletas" | "lecturas" | "busqueda"; quien: string; detalle: string; n: number; fecha: Date };
+type Evento = { tipo: "alta" | "consulta" | "boletas" | "lecturas" | "busqueda"; quien: string; detalle: string; n: number; fecha: Date };
 
-/** Lo último que pasó en la plataforma en los últimos 30 días. */
-export async function actividadReciente(cuantos = 6): Promise<Evento[]> {
+async function actividadReciente(cuantos: number): Promise<Evento[]> {
   const reciente = (columna: string) => `${columna} > now() - interval '30 days'`;
   const filas = await leer<Omit<Evento, "fecha"> & { fecha: string }>(
     `select * from (
@@ -140,6 +138,30 @@ export async function actividadReciente(cuantos = 6): Promise<Evento[]> {
   );
   return filas.map((f) => ({ ...f, fecha: new Date(f.fecha) }));
 }
+
+export type Novedad = { texto: string; cuando: string; nueva: boolean };
+
+function textoEvento(e: Evento) {
+  if (e.tipo === "alta") return `${e.quien} creó su cuenta`;
+  if (e.tipo === "consulta") return `Nueva consulta de ${e.quien} (${e.detalle})`;
+  if (e.tipo === "boletas") return `${e.quien} emitió ${e.n} ${e.n === 1 ? "boleta" : "boletas"} de ${nombreMes(e.detalle)}`;
+  if (e.tipo === "lecturas") return `${e.quien} registró ${e.n} ${e.n === 1 ? "lectura" : "lecturas"} de ${nombreMes(e.detalle)}`;
+  return `Un socio buscó «${e.quien}», de ${e.detalle}`;
+}
+
+/**
+ * Lo último que pasó en la plataforma (30 días), para la campana. Lo piden el marco y el resumen: se lee una sola
+ * vez por visita. Si falla, la campana queda vacía y el resto de la página sigue.
+ */
+export const novedades = cache(async (): Promise<Novedad[]> => {
+  try {
+    const eventos = await actividadReciente(8);
+    return eventos.map((e) => ({ texto: textoEvento(e), cuando: hace(e.fecha), nueva: Date.now() - e.fecha.getTime() < 86_400_000 }));
+  } catch (e) {
+    console.error("Consola: no se pudo leer la actividad:", e);
+    return [];
+  }
+});
 
 /** Días antes del término en que una prueba gratuita pasa a «por vencer». */
 export const DIAS_AVISO_PRUEBA = 3;
