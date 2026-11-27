@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Wrench, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Bot, Building2, Droplet, Gauge, Inbox, Layers, LayoutGrid, Link2, LogOut, Menu, Settings, Wrench, X, type LucideIcon } from "lucide-react";
 import { Campana } from "@/components/consola/campana";
 import { signOut } from "@/lib/auth-client";
 import type { Avisos } from "@/lib/consola";
@@ -15,8 +15,9 @@ type Item = { href: string; texto: string; icono: LucideIcon; exacto?: boolean; 
 const FACILAPR: Item[] = [
   { href: "/facilapr", texto: "Resumen", icono: LayoutGrid, exacto: true },
   { href: "/facilapr/comites", texto: "Comités", icono: Building2, aviso: "comites" },
-  { href: "/facilapr/lecturas", texto: "Lecturas", icono: Gauge, aviso: "lecturas" },
+  { href: "/facilapr/planes", texto: "Planes", icono: Layers },
   { href: "/facilapr/asistente", texto: "Asistente", icono: Bot, aviso: "asistente" },
+  { href: "/facilapr/lecturas", texto: "Lecturas", icono: Gauge, aviso: "lecturas" },
   { href: "/facilapr/direcciones", texto: "Enlaces", icono: Link2 },
   { href: "/consultas", texto: "Consultas", icono: Inbox, aviso: "consultas" },
 ];
