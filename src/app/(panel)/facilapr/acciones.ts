@@ -193,3 +193,17 @@ export async function confirmarLecturasComite(
   revalidatePath("/facilapr/lecturas");
   return { ok: true, cargadas: r.datos.cargadas };
 }
+
+/** Guarda las instrucciones generales del asistente. Las escribe Facilapr, por su API interna. */
+export async function guardarInstrucciones(
+  instrucciones: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr("/api/interno/asistente", { instrucciones });
+  if (!r.ok) return { ok: false, error: r.error };
+
+  revalidatePath("/facilapr/asistente");
+  return { ok: true };
+}

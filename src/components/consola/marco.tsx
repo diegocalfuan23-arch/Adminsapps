@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Wrench, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Sparkles, Wrench, X, type LucideIcon } from "lucide-react";
 import { Campana } from "@/components/consola/campana";
 import { signOut } from "@/lib/auth-client";
 import type { Avisos } from "@/lib/consola";
@@ -16,6 +16,7 @@ const FACILAPR: Item[] = [
   { href: "/facilapr", texto: "Resumen", icono: LayoutGrid, exacto: true },
   { href: "/facilapr/comites", texto: "Comités", icono: Building2, aviso: "comites" },
   { href: "/facilapr/lecturas", texto: "Lecturas", icono: Gauge, aviso: "lecturas" },
+  { href: "/facilapr/asistente", texto: "Asistente", icono: Sparkles },
   { href: "/facilapr/direcciones", texto: "Enlaces", icono: Link2 },
   { href: "/consultas", texto: "Consultas", icono: Inbox, aviso: "consultas" },
 ];
