@@ -1,7 +1,6 @@
-import { cache } from "react";
 import { sql } from "drizzle-orm";
 import { dbFacilagua } from "@/lib/db";
-import { diaEnChile, hace, nombreMes, ultimosMeses } from "@/lib/tiempo";
+import { diaEnChile, ultimosMeses } from "@/lib/tiempo";
 
 /**
  * Lo que muestra la consola de Facilapr, leído de su base (solo lectura).
@@ -17,7 +16,6 @@ async function leer<T>(consulta: string): Promise<T[]> {
 
 /** La fecha de una columna `timestamp` (guardada en UTC) llevada al mes de Chile. */
 const mesDe = (columna: string) => `to_char((${columna} at time zone 'UTC') at time zone 'America/Santiago', 'YYYY-MM')`;
-const diaDe = (columna: string) => `to_char((${columna} at time zone 'UTC') at time zone 'America/Santiago', 'YYYY-MM-DD')`;
 
 export type EstadoComite = "al-dia" | "cargando" | "por-aprobar" | "sin-lecturas";
 
@@ -100,68 +98,6 @@ export async function consultasNuevas(): Promise<ConsultaNueva[]> {
   );
   return filas.map((f) => ({ ...f, fecha: new Date(f.fecha) }));
 }
-
-export type Buscados = { comites: number; busquedas: number; recientes: { nombre: string; comuna: string; veces: number; fecha: Date }[] };
-
-/** Los comités que los socios buscaron en facilapr.cl/socios y no estaban. */
-export async function comitesQueBuscan(): Promise<Buscados> {
-  const [[total], recientes] = await Promise.all([
-    leer<{ comites: number; busquedas: number }>(`select count(*)::int as comites, coalesce(sum(veces), 0)::int as busquedas from "ComiteBuscado"`),
-    leer<{ nombre: string; comuna: string; veces: number; fecha: string }>(
-      `select nombre, comuna, veces, ("updatedAt" at time zone 'UTC') as fecha from "ComiteBuscado" order by "updatedAt" desc limit 3`
-    ),
-  ]);
-  return { comites: total?.comites ?? 0, busquedas: total?.busquedas ?? 0, recientes: recientes.map((r) => ({ ...r, fecha: new Date(r.fecha) })) };
-}
-
-type Evento = { tipo: "alta" | "consulta" | "boletas" | "lecturas" | "busqueda"; quien: string; detalle: string; n: number; fecha: Date };
-
-async function actividadReciente(cuantos: number): Promise<Evento[]> {
-  const reciente = (columna: string) => `${columna} > now() - interval '30 days'`;
-  const filas = await leer<Omit<Evento, "fecha"> & { fecha: string }>(
-    `select * from (
-       select 'alta' as tipo, trim(a.nombre) as quien, coalesce(a.comuna, '') as detalle, 1 as n, (a."createdAt" at time zone 'UTC') as fecha
-         from "Apr" a where ${reciente(`a."createdAt"`)}
-       union all
-       select 'consulta', c.nombre, c.apr, 1, (c."createdAt" at time zone 'UTC') from "Consulta" c where ${reciente(`c."createdAt"`)}
-       union all
-       select 'boletas', trim(a.nombre), b.periodo, count(*)::int, (max(b."createdAt") at time zone 'UTC')
-         from "Boleta" b join "Socio" s on s.id = b."socioId" join "Apr" a on a.id = s."aprId"
-         where ${reciente(`b."createdAt"`)} group by a.id, a.nombre, b.periodo, ${diaDe(`b."createdAt"`)}
-       union all
-       select 'lecturas', trim(a.nombre), l.periodo, count(*)::int, (max(l."createdAt") at time zone 'UTC')
-         from "Lectura" l join "Socio" s on s.id = l."socioId" join "Apr" a on a.id = s."aprId"
-         where ${reciente(`l."createdAt"`)} group by a.id, a.nombre, l.periodo, ${diaDe(`l."createdAt"`)}
-       union all
-       select 'busqueda', nombre, comuna, veces, ("updatedAt" at time zone 'UTC') from "ComiteBuscado" where ${reciente(`"updatedAt"`)}
-     ) e order by fecha desc limit ${Math.trunc(cuantos)}`
-  );
-  return filas.map((f) => ({ ...f, fecha: new Date(f.fecha) }));
-}
-
-export type Novedad = { texto: string; cuando: string; nueva: boolean };
-
-function textoEvento(e: Evento) {
-  if (e.tipo === "alta") return `${e.quien} creó su cuenta`;
-  if (e.tipo === "consulta") return `Nueva consulta de ${e.quien} (${e.detalle})`;
-  if (e.tipo === "boletas") return `${e.quien} emitió ${e.n} ${e.n === 1 ? "boleta" : "boletas"} de ${nombreMes(e.detalle)}`;
-  if (e.tipo === "lecturas") return `${e.quien} registró ${e.n} ${e.n === 1 ? "lectura" : "lecturas"} de ${nombreMes(e.detalle)}`;
-  return `Un socio buscó «${e.quien}», de ${e.detalle}`;
-}
-
-/**
- * Lo último que pasó en la plataforma (30 días), para la campana. Lo piden el marco y el resumen: se lee una sola
- * vez por visita. Si falla, la campana queda vacía y el resto de la página sigue.
- */
-export const novedades = cache(async (): Promise<Novedad[]> => {
-  try {
-    const eventos = await actividadReciente(8);
-    return eventos.map((e) => ({ texto: textoEvento(e), cuando: hace(e.fecha), nueva: Date.now() - e.fecha.getTime() < 86_400_000 }));
-  } catch (e) {
-    console.error("Consola: no se pudo leer la actividad:", e);
-    return [];
-  }
-});
 
 /** Días antes del término en que una prueba gratuita pasa a «por vencer». */
 export const DIAS_AVISO_PRUEBA = 3;

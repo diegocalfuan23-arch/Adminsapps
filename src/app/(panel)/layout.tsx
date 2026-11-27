@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { Marco } from "@/components/consola/marco";
-import { avisosMenu, novedades } from "@/lib/consola";
+import { avisosMenu } from "@/lib/consola";
 
 /**
  * Todas las páginas del panel cuelgan de aquí, así que la sesión se valida
@@ -15,11 +15,10 @@ export default async function PanelLayout({
   const sesion = await auth.api.getSession({ headers: await headers() });
   if (!sesion) redirect("/entrar");
 
-  const [avisos, recientes] = await Promise.all([avisosMenu(), novedades()]);
-  const registro = new URL("/registro", process.env.FACILAPR_URL ?? "https://facilapr.cl").toString();
+  const avisos = await avisosMenu();
 
   return (
-    <Marco avisos={avisos} novedades={recientes} registro={registro} usuario={sesion.user.name || "Administrador"}>
+    <Marco avisos={avisos} usuario={sesion.user.name || "Administrador"}>
       {children}
     </Marco>
   );

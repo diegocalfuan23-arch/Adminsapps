@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, Building2, Check, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, UserPlus, Wrench, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Building2, Droplet, Gauge, Inbox, LayoutGrid, Link2, LogOut, Menu, Settings, Wrench, X, type LucideIcon } from "lucide-react";
 import { Campana } from "@/components/consola/campana";
 import { signOut } from "@/lib/auth-client";
-import type { Avisos, Novedad } from "@/lib/consola";
+import type { Avisos } from "@/lib/consola";
 import { cn } from "@/lib/utils";
 
 type Item = { href: string; texto: string; icono: LucideIcon; exacto?: boolean; aviso?: keyof Avisos };
@@ -41,22 +41,11 @@ const iniciales = (nombre: string) =>
 
 const SECUNDARIO = "flex h-10 w-full items-center gap-3 rounded-xl px-3.5 text-[13.5px] font-medium text-white/60 transition hover:bg-white/[0.06] hover:text-white";
 
-type Datos = { avisos: Avisos; registro: string; usuario: string };
+type Datos = { avisos: Avisos; usuario: string };
 
-function Lateral({ ruta, avisos, registro, usuario, onIr }: Datos & { ruta: string; onIr?: () => void }) {
+function Lateral({ ruta, avisos, usuario, onIr }: Datos & { ruta: string; onIr?: () => void }) {
   const router = useRouter();
-  const [copiado, setCopiado] = useState(false);
   const dentro = enFacilapr(ruta);
-
-  async function copiar() {
-    try {
-      await navigator.clipboard.writeText(registro);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2200);
-    } catch {
-      window.prompt("Copia el enlace de registro", registro);
-    }
-  }
 
   async function salir() {
     await signOut();
@@ -106,16 +95,10 @@ function Lateral({ ruta, avisos, registro, usuario, onIr }: Datos & { ruta: stri
 
       <div className="relative space-y-1 px-4 pb-3">
         {dentro && (
-          <>
-            <Link href="/" onClick={onIr} className={SECUNDARIO}>
-              <ArrowLeft className="size-4" aria-hidden />
-              Volver al panel
-            </Link>
-            <button type="button" onClick={copiar} className={SECUNDARIO}>
-              {copiado ? <Check className="size-4" aria-hidden /> : <UserPlus className="size-4" aria-hidden />}
-              {copiado ? "Enlace copiado" : "Copiar enlace de registro"}
-            </button>
-          </>
+          <Link href="/" onClick={onIr} className={SECUNDARIO}>
+            <ArrowLeft className="size-4" aria-hidden />
+            Volver al panel
+          </Link>
         )}
         <Link href="/configuracion" onClick={onIr} className={cn(SECUNDARIO, ruta.startsWith("/configuracion") && "bg-white/10 text-white")}>
           <Settings className="size-4" aria-hidden />
@@ -140,7 +123,7 @@ function Lateral({ ruta, avisos, registro, usuario, onIr }: Datos & { ruta: stri
 }
 
 /** El marco del panel: menú oscuro fijo a la izquierda; en el teléfono, barra arriba y cajón. */
-export function Marco({ novedades, children, ...datos }: Datos & { novedades: Novedad[]; children: React.ReactNode }) {
+export function Marco({ children, ...datos }: Datos & { children: React.ReactNode }) {
   const ruta = usePathname();
   const [abierto, setAbierto] = useState(false);
   const dentro = enFacilapr(ruta);
@@ -167,7 +150,7 @@ export function Marco({ novedades, children, ...datos }: Datos & { novedades: No
           {dentro ? <Droplet className="size-3.5" fill="currentColor" /> : <LayoutGrid className="size-3.5" />}
         </span>
         <p className="text-[15px] font-semibold">{dentro ? "FacilAPR" : "Panel"}</p>
-        {dentro && <Campana novedades={novedades} oscura className="ml-auto" />}
+        {dentro && <Campana hay={datos.avisos.comites + datos.avisos.lecturas + datos.avisos.consultas > 0} oscura className="ml-auto grid" />}
       </div>
 
       {abierto && (

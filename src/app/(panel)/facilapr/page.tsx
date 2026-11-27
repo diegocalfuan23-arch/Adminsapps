@@ -2,8 +2,8 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { ArrowDownRight, ArrowUpRight, Check, Gauge, Hourglass, Inbox, Sparkles, Users, type LucideIcon } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { comitesConsola, comitesQueBuscan, consultasNuevas, novedades, pruebaPorVencer, seriesConsola, type ComiteConsola } from "@/lib/consola";
-import { diaEnChile, diasDesde, diasHasta, diasParaFinDeMes, hace, mesCorto, nombreMes, ultimosMeses } from "@/lib/tiempo";
+import { comitesConsola, consultasNuevas, pruebaPorVencer, seriesConsola, type ComiteConsola } from "@/lib/consola";
+import { diaEnChile, diasDesde, diasHasta, diasParaFinDeMes, mesCorto, nombreMes, ultimosMeses } from "@/lib/tiempo";
 import { Buscador } from "@/components/consola/buscador";
 import { Campana } from "@/components/consola/campana";
 import { Anillo, Area, ESTADO, ESTADOS, TARJETA } from "@/components/consola/piezas";
@@ -43,8 +43,8 @@ function sugerencia(comites: ComiteConsola[], mes: string, faltan: number) {
 }
 
 async function cargar() {
-  const [comites, series, consultas, buscados, recientes] = await Promise.all([comitesConsola(), seriesConsola(), consultasNuevas(), comitesQueBuscan(), novedades()]);
-  return { comites, series, consultas, buscados, recientes };
+  const [comites, series, consultas] = await Promise.all([comitesConsola(), seriesConsola(), consultasNuevas()]);
+  return { comites, series, consultas };
 }
 
 export default async function ConsolaPage() {
@@ -60,7 +60,7 @@ export default async function ConsolaPage() {
     const causa = (e as { cause?: { message?: string } }).cause?.message ?? (e as Error).message;
     return <p className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">No se pudo leer la base de Facilapr: {causa}</p>;
   }
-  const { comites, series, consultas, buscados, recientes } = datos;
+  const { comites, series, consultas } = datos;
 
   const hoy = diaEnChile();
   const mes = nombreMes(hoy.slice(0, 7));
@@ -108,7 +108,7 @@ export default async function ConsolaPage() {
         {/* Al abrir el formulario de comité nuevo (o mostrar su clave), la fila ocupa todo el ancho. */}
         <div className="flex w-full flex-wrap items-center gap-2 has-[dl]:w-full has-[select]:w-full sm:w-auto">
           <Buscador />
-          <Campana novedades={recientes} className="hidden lg:block" />
+          <Campana hay={pendientes.length > 0} className="hidden lg:grid" />
           <CrearComite urlLogin={process.env.FACILAPR_URL ? direccion("/login") : null} />
         </div>
       </header>
@@ -181,7 +181,7 @@ export default async function ConsolaPage() {
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2 xl:grid-cols-12">
-        <section className={cn(TARJETA, "min-w-0 p-6 sm:p-7 xl:col-span-5")}>
+        <section id="por-hacer" className={cn(TARJETA, "min-w-0 scroll-mt-20 p-6 sm:p-7 xl:col-span-5")}>
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-[17px] font-semibold tracking-tight">Por hacer</h2>
             {pendientes.length > 0 && (
@@ -280,26 +280,6 @@ export default async function ConsolaPage() {
         />
       </div>
 
-      {buscados.comites > 0 && (
-        <section className={cn(TARJETA, "mt-4 p-6 sm:p-7")}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[17px] font-semibold tracking-tight">Comités que buscan</h2>
-            <span className="rounded-full bg-[#EAE6FF] px-2.5 py-1 text-[12px] font-semibold text-[#3A0CE3]">
-              {plural(buscados.comites, "comité", "comités")} · {plural(buscados.busquedas, "búsqueda", "búsquedas")}
-            </span>
-          </div>
-          <ul className="mt-4 grid gap-2 md:grid-cols-3">
-            {buscados.recientes.map((b) => (
-              <li key={`${b.nombre}-${b.comuna}`} className="min-w-0 rounded-2xl bg-[#F7F6FB] p-4">
-                <p className="truncate text-[14px] font-semibold">{b.nombre}</p>
-                <p className="truncate text-[12.5px] text-[#75718F]">
-                  {b.comuna} · {plural(b.veces, "búsqueda", "búsquedas")} · {hace(b.fecha)}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
     </>
   );
 }
