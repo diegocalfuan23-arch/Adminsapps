@@ -35,8 +35,8 @@ export function Plegable({ titulo, resumen, abierto, onAbrir, children }: { titu
   );
 }
 
-/** El encabezado de cada capa: ícono, título y lo que haya a la derecha. */
-export function Cabecera({ icono: Icono, titulo, detalle, children }: { icono: LucideIcon; titulo: string; detalle: string; children?: React.ReactNode }) {
+/** El encabezado de cada capa: ícono, título, un detalle opcional y lo que haya a la derecha. */
+export function Cabecera({ icono: Icono, titulo, detalle, children }: { icono: LucideIcon; titulo: string; detalle?: string; children?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-[#F0EEF8] px-6 py-5 sm:px-8">
       <span className="grid size-10 place-items-center rounded-xl bg-[#F1EEFF] text-[#3A0CE3]">
@@ -44,7 +44,7 @@ export function Cabecera({ icono: Icono, titulo, detalle, children }: { icono: L
       </span>
       <div className="min-w-0 flex-1">
         <h2 className="truncate text-[17px] font-semibold">{titulo}</h2>
-        <p className="text-[12.5px] text-[#8D89A6]">{detalle}</p>
+        {detalle && <p className="text-[12.5px] text-[#8D89A6]">{detalle}</p>}
       </div>
       {children}
     </div>

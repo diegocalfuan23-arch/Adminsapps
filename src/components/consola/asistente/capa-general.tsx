@@ -21,7 +21,7 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
 
   return (
     <div>
-      <Cabecera icono={Globe} titulo="Base general" detalle="Lo que todos los asistentes saben y respetan. Los comités no pueden cambiarla." />
+      <Cabecera icono={Globe} titulo="Base general" />
 
       <div className="space-y-5 px-5 py-5 sm:px-8 md:space-y-7 md:py-6">
         <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
@@ -50,9 +50,6 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
         <div>
           <div className="flex items-baseline justify-between">
             <span className={ETIQUETA}>Instrucciones</span>
-            <span className="text-[11.5px] text-[#A3A0B8] tabular-nums">
-              {ajustes.instrucciones.length}/{MAXIMO_INSTRUCCIONES.toLocaleString("es-CL")}
-            </span>
           </div>
           <textarea
             value={ajustes.instrucciones}
@@ -65,7 +62,7 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
         </div>
 
         <div>
-          <Plegable titulo="Reglas que nunca rompe" resumen={`${activas} activas`} abierto={abierto === "reglas"} onAbrir={() => alternar("reglas")}>
+          <Plegable titulo="Reglas" resumen={`${activas} activas`} abierto={abierto === "reglas"} onAbrir={() => alternar("reglas")}>
             <ul className="mt-2 divide-y divide-[#F0EEF8] rounded-2xl ring-1 ring-[#EEEBF6]">
               <li className="flex items-center gap-3 px-4 py-2.5">
                 <span className="min-w-0 flex-1 text-[13.5px] sm:truncate">{REGLA_FIJA}</span>
@@ -107,7 +104,7 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
         </div>
 
         <div>
-          <Plegable titulo="Temas que responde" resumen={`${TEMAS.length - ajustes.temasApagados.length} de ${TEMAS.length}`} abierto={abierto === "temas"} onAbrir={() => alternar("temas")}>
+          <Plegable titulo="Temas" resumen={`${TEMAS.length - ajustes.temasApagados.length} de ${TEMAS.length}`} abierto={abierto === "temas"} onAbrir={() => alternar("temas")}>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {TEMAS.map((t) => {
                 const on = !ajustes.temasApagados.includes(t);
@@ -129,7 +126,6 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
                 );
               })}
             </div>
-            <p className="mt-2 text-[12px] text-[#A3A0B8]">Lo que no esté activo se deriva a la directiva.</p>
           </Plegable>
         </div>
       </div>

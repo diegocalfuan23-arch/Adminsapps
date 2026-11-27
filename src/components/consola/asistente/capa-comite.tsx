@@ -29,11 +29,11 @@ export function CapaComite({
   const datos: [string, string | null][] = [
     ["Horario", comite.horario],
     ["Teléfono", comite.telefono],
-    ["Vencimiento", `${comite.diasVencimiento} días desde la emisión`],
-    ["Cortes", `Con más de ${comite.diasGracia} días de atraso`],
+    ["Vencimiento", `${comite.diasVencimiento} días`],
+    ["Cortes", `${comite.diasGracia} días de atraso`],
   ];
   const detalle =
-    estado === "general" ? "Solo usa la base general" : comite.editado ? `Editado ${comite.editado} por ${comite.autor}` : "Con instrucciones propias";
+    estado === "general" ? "Sin instrucciones propias" : comite.editado ? `${comite.autor} · ${comite.editado}` : "Con instrucciones propias";
 
   return (
     <div>
@@ -47,7 +47,7 @@ export function CapaComite({
       {estado === "revisar" && (
         <div className="mx-6 mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 sm:mx-8">
           <Sparkles className="size-4 shrink-0 text-amber-600" aria-hidden />
-          <p className="min-w-0 flex-1 text-[13px] text-amber-900">La directiva cambió sus instrucciones. Revisa antes de que lleguen a los socios.</p>
+          <p className="min-w-0 flex-1 text-[13px] text-amber-900">Cambios por revisar</p>
           <div className="flex gap-1.5">
             <button type="button" disabled={ocupado} onClick={() => onRevisar("aprobar")} className="h-8 rounded-lg bg-[#110C2E] px-3 text-[12.5px] font-semibold text-white disabled:opacity-50">
               Aprobar
@@ -71,7 +71,7 @@ export function CapaComite({
 
         <div>
           <div className="flex items-baseline justify-between">
-            <span className={ETIQUETA}>Lo que agrega el comité</span>
+            <span className={ETIQUETA}>Instrucciones del comité</span>
             {estado !== "general" && (
               <button type="button" onClick={() => onCambiar("")} className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#8D89A6] hover:text-[#16132B]">
                 <RotateCcw className="size-3" />
@@ -86,14 +86,14 @@ export function CapaComite({
               onChange={(e) => onCambiar(e.target.value)}
               rows={5}
               aria-label={`Instrucciones de ${comite.nombre}`}
-              placeholder="Este comité aún no agrega nada. Escribe aquí lo propio del comité."
+              placeholder="Sin instrucciones propias."
               className="w-full resize-y rounded-2xl bg-transparent px-4 py-3 text-[13.5px] leading-[1.7] outline-none placeholder:text-[#B4B0C8]"
             />
           </div>
         </div>
 
         <div>
-          <span className={ETIQUETA}>Datos del comité</span>
+          <span className={ETIQUETA}>Datos</span>
           <div className="mt-2 flex flex-wrap gap-2">
             {datos.map(
               ([k, v]) =>
@@ -105,7 +105,6 @@ export function CapaComite({
                 )
             )}
           </div>
-          <p className="mt-2 text-[12px] text-[#A3A0B8]">Vienen de la configuración del comité y se actualizan solos.</p>
         </div>
       </div>
     </div>

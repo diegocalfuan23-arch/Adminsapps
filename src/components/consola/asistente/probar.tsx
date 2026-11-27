@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Bot, Eye, X } from "lucide-react";
 import { probarAsistente } from "@/app/(panel)/facilapr/acciones";
-import { CAMPO, ETIQUETA } from "@/components/consola/asistente/piezas";
+import { CAMPO } from "@/components/consola/asistente/piezas";
 import { REGLA_FIJA, type Ajustes, type ComiteAsistente, type Mensaje } from "@/lib/asistente-comun";
 import { cn } from "@/lib/utils";
 
-const SUGERENCIAS = ["¿Cuánto debo?", "¿Cuándo es el corte?", "Horario"];
+const SUGERENCIAS = ["¿Cuánto debo?", "¿Cuándo es el corte?"];
 const ALTO = "min-h-0 flex-1 overflow-y-auto p-4 max-xl:flex-none h-[56vh]";
 
 /**
@@ -75,11 +75,11 @@ export function Probar({
           <Bot className="size-[18px]" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13.5px] font-semibold">Probar a {ajustes.nombre.trim() || "tu asistente"}</p>
+          <p className="truncate text-[13.5px] font-semibold">{ajustes.nombre.trim() || "Asistente"}</p>
           <select value={comite.id} onChange={(e) => onElegir(e.target.value)} aria-label="Comité de prueba" className="-ml-1 w-full truncate bg-transparent text-[12px] text-[#8D89A6] outline-none">
             {comites.map((x) => (
               <option key={x.id} value={x.id}>
-                como socio de {x.nombre}
+                {x.nombre}
               </option>
             ))}
           </select>
@@ -97,7 +97,6 @@ export function Probar({
 
       {verFinal ? (
         <div className={cn(ALTO, "space-y-3 text-[12.5px] leading-relaxed break-words md:h-auto md:max-h-[420px] xl:max-h-none")}>
-          <p className={ETIQUETA}>Lo que recibe el asistente</p>
           <div className="rounded-xl border-l-[3px] border-[#3A0CE3] bg-white p-3 ring-1 ring-[#EEEBF6]">
             <p className="mb-1 text-[11px] font-semibold text-[#3A0CE3]">Base general</p>
             <p className="whitespace-pre-line text-[#5E5A78]">{ajustes.instrucciones}</p>
@@ -120,7 +119,7 @@ export function Probar({
       ) : (
         <div ref={caja} aria-live="polite" className={cn(ALTO, "flex flex-col gap-2.5 md:h-[340px] xl:h-auto")}>
           {!chat.length && !error && (
-            <p className="m-auto max-w-[220px] text-center text-[12.5px] text-[#A3A0B8]">Escribe como si fueras un socio para ver cómo responde.</p>
+            <p className="m-auto text-center text-[12.5px] text-[#A3A0B8]">Escribe como socio</p>
           )}
           {chat.map((m, i) => (
             <div

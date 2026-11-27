@@ -43,7 +43,7 @@ export function CapaConocimiento({ documentos, comites, aviso }: { documentos: D
 
   return (
     <div>
-      <Cabecera icono={BookOpen} titulo="Conocimiento" detalle="Documentos que el asistente consulta para responder.">
+      <Cabecera icono={BookOpen} titulo="Conocimiento">
         <button
           type="button"
           onClick={() => {

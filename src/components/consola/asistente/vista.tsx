@@ -16,10 +16,26 @@ const GENERAL = "general";
 const CONOCIMIENTO = "conocimiento";
 
 const PUNTO: Record<EstadoInstrucciones, string> = { personalizado: "bg-[#7A5CFF]", revisar: "bg-amber-400", general: "bg-[#D9D4EE]" };
-const ETIQUETA_ESTADO: Record<EstadoInstrucciones, string> = { personalizado: "Personalizado", revisar: "Por revisar", general: "Solo general" };
 
 /** Una entrada de la columna de capas: con ícono, o con el punto de estado de un comité. */
-function Entrada({ activa, onClick, icono: Icono, titulo, detalle, punto }: { activa: boolean; onClick: () => void; icono?: LucideIcon; titulo: string; detalle: string; punto?: string }) {
+function Entrada({
+  activa,
+  onClick,
+  icono: Icono,
+  titulo,
+  detalle,
+  punto,
+  aviso,
+}: {
+  activa: boolean;
+  onClick: () => void;
+  icono?: LucideIcon;
+  titulo: string;
+  detalle?: string;
+  punto?: string;
+  /** Cuántas cosas esperan revisión. */
+  aviso?: number;
+}) {
   return (
     <button
       type="button"
@@ -36,8 +52,9 @@ function Entrada({ activa, onClick, icono: Icono, titulo, detalle, punto }: { ac
       )}
       <span className="min-w-0 flex-1">
         <span className={cn("block truncate text-[13.5px]", activa ? "font-semibold text-[#16132B]" : "font-medium text-[#3F3B58]")}>{titulo}</span>
-        <span className="block truncate text-[11.5px] text-[#8D89A6]">{detalle}</span>
+        {detalle && <span className="block truncate text-[11.5px] text-[#8D89A6]">{detalle}</span>}
       </span>
+      {aviso ? <span className="grid h-5 min-w-5 place-items-center rounded-full bg-amber-100 px-1.5 text-[11px] font-semibold text-amber-800">{aviso}</span> : null}
     </button>
   );
 }
@@ -119,7 +136,6 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
       <header className="flex flex-wrap items-center justify-between gap-3 sm:items-end sm:gap-4">
         <div>
           <h1 className="text-[28px] font-semibold tracking-[-0.025em] sm:text-[32px]">Asistente</h1>
-          <p className="text-[14.5px] text-[#8D89A6] max-sm:hidden">Entrena a {ajustes.nombre.trim() || "tu asistente"}: una base común y lo que agrega cada comité.</p>
         </div>
         <div className="flex items-center gap-3">
           <span role="status" className={cn("inline-flex items-center gap-2 text-[13px] font-medium", cambios ? "text-amber-700" : "text-[#8D89A6]")}>
@@ -170,8 +186,7 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
         {/* Capas */}
         <aside className="hidden min-h-0 flex-col border-r border-[#F0EEF8] bg-[#F8F7FC] md:flex">
           <div className="p-3 pb-2">
-            <p className={cn(ETIQUETA, "px-2 pt-1 pb-2")}>Capas del asistente</p>
-            <Entrada activa={capa === GENERAL} onClick={() => elegir(GENERAL)} icono={Globe} titulo="Base general" detalle="Aplica a todos" />
+            <Entrada activa={capa === GENERAL} onClick={() => elegir(GENERAL)} icono={Globe} titulo="Base general" />
           </div>
           <div className="flex min-h-0 flex-1 flex-col px-3">
             <div className="flex items-center justify-between px-2 pt-2 pb-2">
@@ -187,7 +202,7 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
                 <span aria-hidden className="absolute top-1 bottom-1 left-[17px] w-px bg-[#E2DEF2]" />
                 <div className="relative space-y-0.5">
                   {lista.map((c) => (
-                    <Entrada key={c.id} activa={capa === c.id} onClick={() => elegir(c.id)} titulo={c.nombre} detalle={ETIQUETA_ESTADO[estado(c)]} punto={PUNTO[estado(c)]} />
+                    <Entrada key={c.id} activa={capa === c.id} onClick={() => elegir(c.id)} titulo={c.nombre} punto={PUNTO[estado(c)]} aviso={c.propuesta !== null ? 1 : 0} />
                   ))}
                 </div>
               </div>
