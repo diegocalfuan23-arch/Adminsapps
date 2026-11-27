@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import type { Ajustes, Mensaje } from "@/lib/asistente-comun";
 import { llamarFacilapr, subirAFacilapr } from "@/lib/facilapr";
 
 export type DatosComite = {
@@ -194,16 +195,32 @@ export async function confirmarLecturasComite(
   return { ok: true, cargadas: r.datos.cargadas };
 }
 
-/** Guarda las instrucciones generales del asistente. Las escribe Facilapr, por su API interna. */
-export async function guardarInstrucciones(
-  instrucciones: string
+/** Publica la base general del asistente y las instrucciones de los comités que cambiaron. Las escribe Facilapr. */
+export async function publicarAsistente(
+  ajustes: Ajustes,
+  comites: { aprId: string; instrucciones: string }[]
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const sesion = await auth.api.getSession({ headers: await headers() });
   if (!sesion) return { ok: false, error: "Sin sesión." };
 
-  const r = await llamarFacilapr("/api/interno/asistente", { instrucciones });
+  const r = await llamarFacilapr("/api/interno/asistente", { ajustes, comites });
   if (!r.ok) return { ok: false, error: r.error };
 
   revalidatePath("/facilapr/asistente");
   return { ok: true };
+}
+
+/** Una respuesta de prueba con lo que hay en pantalla, esté o no publicado. No guarda nada. */
+export async function probarAsistente(datos: {
+  aprId: string;
+  ajustes: Ajustes;
+  instrucciones: string;
+  mensajes: Mensaje[];
+}): Promise<{ ok: true; texto: string; derivado: boolean } | { ok: false; error: string }> {
+  const sesion = await auth.api.getSession({ headers: await headers() });
+  if (!sesion) return { ok: false, error: "Sin sesión." };
+
+  const r = await llamarFacilapr<{ texto: string; derivado: boolean }>("/api/interno/asistente/probar", datos);
+  if (!r.ok) return { ok: false, error: r.error };
+  return { ok: true, texto: r.datos.texto, derivado: r.datos.derivado };
 }
