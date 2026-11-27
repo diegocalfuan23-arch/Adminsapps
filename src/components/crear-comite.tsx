@@ -23,7 +23,7 @@ const campoClase =
  * Alta manual de un comité y de su administrador. La clave se genera en
  * Facilapr y se muestra UNA sola vez: aquí no se guarda en ninguna parte.
  */
-export function CrearComite({ urlLogin }: { urlLogin: string | null }) {
+export function CrearComite({ urlLogin, conTexto = false }: { urlLogin: string | null; /** El texto del botón se ve también en el teléfono. */ conTexto?: boolean }) {
   const [abierto, setAbierto] = useState(false);
   const [error, setError] = useState<{ texto: string; campo?: string } | null>(null);
   const [exito, setExito] = useState<Exito | null>(null);
@@ -75,7 +75,7 @@ export function CrearComite({ urlLogin }: { urlLogin: string | null }) {
         className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#110C2E] px-4 text-[14px] font-semibold text-white transition hover:bg-[#241D52] sm:px-5"
       >
         <Plus className="size-4" aria-hidden />
-        <span className="hidden sm:inline">Nuevo comité</span>
+        <span className={conTexto ? "" : "hidden sm:inline"}>Nuevo comité</span>
       </button>
     );
   }
