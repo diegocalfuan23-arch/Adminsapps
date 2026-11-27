@@ -8,7 +8,8 @@ import { REGLA_FIJA, type Ajustes, type ComiteAsistente, type Mensaje } from "@/
 import { cn } from "@/lib/utils";
 
 const SUGERENCIAS = ["¿Cuánto debo?", "¿Cuándo es el corte?"];
-const ALTO = "min-h-0 flex-1 overflow-y-auto p-4 max-xl:flex-none h-[56vh]";
+// La conversación se desplaza sin mostrar barra.
+const ALTO = "min-h-0 flex-1 overflow-y-auto p-4 max-xl:flex-none h-[56vh] [scrollbar-width:none]";
 
 /**
  * El chat de prueba: responde Facilapr con lo que hay en pantalla, publicado o no, y un socio de ejemplo.
@@ -142,7 +143,7 @@ export function Probar({
       )}
 
       <div className="border-t border-[#F0EEF8] p-3">
-        <div className="mb-2 flex gap-1.5 overflow-x-auto p-px [scrollbar-width:none]">
+        <div className="mb-2 flex flex-wrap gap-1.5">
           {SUGERENCIAS.map((s) => (
             <button
               key={s}

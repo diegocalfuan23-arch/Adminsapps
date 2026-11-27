@@ -55,9 +55,8 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
             value={ajustes.instrucciones}
             maxLength={MAXIMO_INSTRUCCIONES}
             onChange={(e) => onCambiar({ instrucciones: e.target.value })}
-            rows={6}
             aria-label="Instrucciones generales"
-            className={cn(CAMPO, "mt-2 resize-y py-3 leading-[1.7] max-md:h-36")}
+            className={cn(CAMPO, "mt-2 field-sizing-content min-h-36 resize-none py-3 leading-[1.7]")}
           />
         </div>
 
@@ -65,15 +64,13 @@ export function CapaGeneral({ ajustes, onCambiar }: { ajustes: Ajustes; onCambia
           <Plegable titulo="Reglas" resumen={`${activas} activas`} abierto={abierto === "reglas"} onAbrir={() => alternar("reglas")}>
             <ul className="mt-2 divide-y divide-[#F0EEF8] rounded-2xl ring-1 ring-[#EEEBF6]">
               <li className="flex items-center gap-3 px-4 py-2.5">
-                <span className="min-w-0 flex-1 text-[13.5px] sm:truncate">{REGLA_FIJA}</span>
+                <span className="min-w-0 flex-1 text-[13.5px]">{REGLA_FIJA}</span>
                 <Lock className="size-3.5 shrink-0 text-[#B4B0C8]" aria-label="Regla fija" />
                 <Interruptor on disabled nombre={REGLA_FIJA} />
               </li>
               {ajustes.reglas.map((r) => (
                 <li key={r.id} className="flex items-center gap-3 px-4 py-2.5">
-                  <span className="min-w-0 flex-1 text-[13.5px] sm:truncate" title={r.texto}>
-                    {r.texto}
-                  </span>
+                  <span className="min-w-0 flex-1 text-[13.5px] break-words">{r.texto}</span>
                   <Interruptor on={r.activa} nombre={r.texto} onChange={() => onCambiar({ reglas: ajustes.reglas.map((x) => (x.id === r.id ? { ...x, activa: !x.activa } : x)) })} />
                 </li>
               ))}

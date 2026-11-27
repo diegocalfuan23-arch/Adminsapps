@@ -18,9 +18,5 @@ export default async function AsistentePage() {
   }
   const [ajustes, comites, documentos] = datos;
 
-  return (
-    <div className="mx-auto max-w-[1136px]">
-      <AsistenteVista publicados={ajustes} comites={comites} documentos={documentos} />
-    </div>
-  );
+  return <AsistenteVista publicados={ajustes} comites={comites} documentos={documentos} />;
 }

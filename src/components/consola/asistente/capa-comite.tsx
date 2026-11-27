@@ -84,10 +84,9 @@ export function CapaComite({
               value={instrucciones}
               maxLength={MAXIMO_INSTRUCCIONES_COMITE}
               onChange={(e) => onCambiar(e.target.value)}
-              rows={5}
               aria-label={`Instrucciones de ${comite.nombre}`}
               placeholder="Sin instrucciones propias."
-              className="w-full resize-y rounded-2xl bg-transparent px-4 py-3 text-[13.5px] leading-[1.7] outline-none placeholder:text-[#B4B0C8]"
+              className="block field-sizing-content min-h-36 w-full resize-none rounded-2xl bg-transparent px-4 py-3 text-[13.5px] leading-[1.7] outline-none placeholder:text-[#B4B0C8]"
             />
           </div>
         </div>

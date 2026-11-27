@@ -182,13 +182,14 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
         </div>
       </div>
 
-      <div className={cn(TARJETA, "mt-3 grid grid-cols-1 overflow-hidden md:mt-6 md:grid-cols-[250px_minmax(0,1fr)] xl:h-[calc(100vh-170px)] xl:min-h-[640px] xl:grid-cols-[250px_minmax(0,1fr)_340px] xl:grid-rows-[minmax(0,1fr)]")}>
+      <div className={cn(TARJETA, "mt-3 grid grid-cols-1 overflow-clip md:mt-6 md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[230px_minmax(0,1fr)_340px] 2xl:grid-cols-[260px_minmax(0,1fr)_400px]")}>
         {/* Capas */}
-        <aside className="hidden min-h-0 flex-col border-r border-[#F0EEF8] bg-[#F8F7FC] md:flex">
+        <aside className="hidden border-r border-[#F0EEF8] bg-[#F8F7FC] md:block">
+          <div className="sticky top-0">
           <div className="p-3 pb-2">
             <Entrada activa={capa === GENERAL} onClick={() => elegir(GENERAL)} icono={Globe} titulo="Base general" />
           </div>
-          <div className="flex min-h-0 flex-1 flex-col px-3">
+          <div className="px-3">
             <div className="flex items-center justify-between px-2 pt-2 pb-2">
               <p className={ETIQUETA}>Comités</p>
               {porRevisar > 0 && <span className="text-[11.5px] font-semibold text-amber-700">{porRevisar} por revisar</span>}
@@ -197,7 +198,7 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
               <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#A3A0B8]" />
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar" aria-label="Buscar comité" className={cn(CAMPO, "h-9 pl-8 text-[13px]")} />
             </label>
-            <div className="relative min-h-0 flex-1 overflow-y-auto pb-2 [scrollbar-width:thin] md:max-xl:max-h-[320px]">
+            <div className="pb-2">
               <div className="relative">
                 <span aria-hidden className="absolute top-1 bottom-1 left-[17px] w-px bg-[#E2DEF2]" />
                 <div className="relative space-y-0.5">
@@ -217,10 +218,11 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
               detalle={`${documentos.length} ${documentos.length === 1 ? "documento" : "documentos"}`}
             />
           </div>
+          </div>
         </aside>
 
         {/* Editor */}
-        <section className={cn("min-h-0 min-w-0 overflow-y-auto", vista === "probar" && "max-md:hidden")}>
+        <section className={cn("min-w-0", vista === "probar" && "max-md:hidden")}>
           {capa === CONOCIMIENTO ? (
             <CapaConocimiento documentos={documentos} comites={comites} aviso={aviso} />
           ) : elegido ? (
@@ -244,7 +246,8 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
         </section>
 
         {/* Probar */}
-        <aside className={cn("flex min-h-0 min-w-0 flex-col bg-[#FBFAFE] md:col-span-2 md:border-t md:border-[#F0EEF8] xl:col-span-1 xl:border-t-0 xl:border-l", vista === "editar" && "max-md:hidden")}>
+        <aside className={cn("min-w-0 bg-[#FBFAFE] md:col-span-2 md:border-t md:border-[#F0EEF8] xl:col-span-1 xl:border-t-0 xl:border-l", vista === "editar" && "max-md:hidden")}>
+          <div className="flex flex-col xl:sticky xl:top-0 xl:h-[calc(100vh-150px)] xl:min-h-[520px]">
           {dePrueba ? (
             <Probar
               key={`${dePrueba.id}-${prueba.vez}`}
@@ -257,6 +260,7 @@ export function AsistenteVista({ publicados, comites, documentos }: { publicados
           ) : (
             <p className="m-auto p-8 text-[13px] text-[#8D89A6]">Todavía no hay comités.</p>
           )}
+          </div>
         </aside>
       </div>
 

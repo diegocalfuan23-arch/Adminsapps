@@ -167,7 +167,8 @@ export function Marco({ children, ...datos }: Datos & { children: React.ReactNod
       )}
 
       <main className="lg:pl-[264px]">
-        <div className="mx-auto max-w-[1264px] px-4 pt-5 pb-16 sm:px-6 lg:px-8 lg:pt-8">{children}</div>
+        {/* El asistente tiene tres columnas: necesita más ancho que el resto. */}
+        <div className={cn("mx-auto px-4 pt-5 pb-16 sm:px-6 lg:px-8 lg:pt-8", ruta === "/facilapr/asistente" ? "max-w-[1680px]" : "max-w-[1264px]")}>{children}</div>
       </main>
     </div>
   );
